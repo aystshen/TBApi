@@ -4,7 +4,7 @@ import android.app.Activity;
 
 import com.topband.tbapi.utils.ShellUtils;
 
-interface TBManagerInterface {
+interface ITBManager {
     /**
      * 获取API版本号
      *

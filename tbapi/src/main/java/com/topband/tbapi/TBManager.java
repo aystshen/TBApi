@@ -34,7 +34,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
-public class TBManager implements TBManagerInterface {
+public class TBManager implements ITBManager {
     private static final String TAG = "TBManager";
 
     // API版本
