@@ -29,7 +29,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
+public class MainActivity extends AppCompatActivity implements
+        CompoundButton.OnCheckedChangeListener,
+        SeekBar.OnSeekBarChangeListener {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.tv_api_version)
@@ -170,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     @SuppressLint("DefaultLocale")
     private void init() {
+        // 系统信息
         mApiVersionTv.setText(mTBManager.getAPIVersion());
         mAndroidVersionTv.setText(mTBManager.getAndroidVersion());
         mFwVersionTv.setText(mTBManager.getFirmwareVersion());
@@ -179,24 +182,24 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         mMemorySizeTv.setText(mTBManager.getMemorySize() / 1024 / 1024 + "MB");
         mStorageSizeTv.setText(mTBManager.getInternalStorageSize() / 1024 / 1024 + "MB");
 
+        // 看门狗
         mWatchdogBtn.setChecked(mTBManager.watchdogIsOpen());
         mWatchdogBtn.setOnCheckedChangeListener(this);
         mGetWatchdogTimeoutBtn.setText(String.format("获取看门狗超时(%d秒)",
                 mTBManager.getWatchdogTimeout()));
 
+        // 显示
         mRotationBtn.setText(String.format("旋转屏幕(%d)", mTBManager.getRotation()));
         mStatusbarBtn.setChecked(mTBManager.isStatusBarShow());
         mStatusbarBtn.setOnCheckedChangeListener(this);
         mNavbarBtn.setChecked(mTBManager.isNavBarShow());
         mNavbarBtn.setOnCheckedChangeListener(this);
-
         mScreenWidthTv.setText(mTBManager.getScreenWidth(this) + "");
         mScreenHeightTv.setText(mTBManager.getScreenHeight(this) + "");
-
         mMainBacklightSeekbar.setOnSeekBarChangeListener(this);
         mSubBacklightSeekbar.setOnSeekBarChangeListener(this);
 
-        // 初始化网络类型
+        // 网络
         switch (mTBManager.getNetworkType()) {
             case 0:
                 mWifiRdo.setChecked(true);
@@ -208,8 +211,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 mEthRdo.setChecked(true);
                 break;
         }
-
-        // 初始化DHCP
         mDhcpBtn.setChecked(mTBManager.isDhcp());
         if (mTBManager.isDhcp()) {
             mSetIpBtn.setEnabled(false);
@@ -219,22 +220,18 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             mEthDnsEdt.setEnabled(false);
         }
         mDhcpBtn.setOnCheckedChangeListener(this);
-
-        // 初始化MAC地址
         mWifiMacTv.setText(mTBManager.getWiFiMac());
         mEthMacTv.setText(mTBManager.getEthMac());
-
-        // 初始化以太网IP
         mEthIpEdt.setText(mTBManager.getEthIp());
         mEthMaskEdt.setText(mTBManager.getEthMask());
         mEthGatewayEdt.setText(mTBManager.getEthGateway());
         mEthDnsEdt.setText(mTBManager.getEthDns());
 
-        // 初始化存储路径
+        // 存储
         mSdcardPathTv.setText(mTBManager.getSdcardPath());
         mUsbPathTv.setText(mTBManager.getUsbPath(0));
 
-        // 初始化GPIO
+        // 硬件接口
         if (mTBManager.getGpioNum() > 0) {
             String[] spinnerItems = new String[mTBManager.getGpioNum()];
             for (int i = 0; i < mTBManager.getGpioNum(); i++) {
@@ -266,8 +263,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             mGpioBtn.setEnabled(false);
         }
 
-        // 初始化日志写文件
-        Log.w(TAG, "mTBManager.isLog2fileOpen(): " + mTBManager.isLog2fileOpen());
+        // 日志
         mLog2fileBtn.setChecked(mTBManager.isLog2fileOpen());
         mLog2fileBtn.setOnCheckedChangeListener(this);
         mGetLog2fileNumBtn.setText(String.format("获取最大日志文件数(%d)",
@@ -282,12 +278,11 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     }
 
     @SuppressLint("DefaultLocale")
-    @OnClick({R.id.btn_shutdown, R.id.btn_reboot, R.id.btn_timing_switch,
-            R.id.btn_watchdog_feed, R.id.btn_set_watchdog_timeout, R.id.btn_get_watchdog_timeout,
-            R.id.btn_screenshot, R.id.btn_rotation,
-            R.id.btn_check_update, R.id.btn_install_update, R.id.btn_verity_update, R.id.btn_delete_update,
-            R.id.btn_set_ip, R.id.btn_gpio, R.id.btn_get_gpio, R.id.btn_refresh_camera,
-            R.id.btn_set_log2file_num, R.id.btn_get_log2file_num,
+    @OnClick({R.id.btn_shutdown, R.id.btn_reboot, R.id.btn_timing_switch, R.id.btn_watchdog_feed,
+            R.id.btn_set_watchdog_timeout, R.id.btn_get_watchdog_timeout, R.id.btn_screenshot,
+            R.id.btn_rotation, R.id.btn_check_update, R.id.btn_install_update, R.id.btn_verity_update,
+            R.id.btn_delete_update, R.id.btn_set_ip, R.id.btn_gpio, R.id.btn_get_gpio,
+            R.id.btn_refresh_camera, R.id.btn_set_log2file_num, R.id.btn_get_log2file_num,
             R.id.btn_shell_cmd, R.id.btn_silent_install})
     public void onViewClicked(View view) {
         switch (view.getId()) {
