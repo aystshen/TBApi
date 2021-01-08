@@ -482,6 +482,13 @@ interface TBManagerInterface {
     public void close4gKeepLive();
 
     /**
+     * 4G保活是否打开
+     *
+     * @return true：打开，false：关闭
+     */
+    public boolean keepLiveIsOpen();
+
+    /**
      * 打开按键事件拦截
      */
     public void openKeyIntercept();
@@ -490,6 +497,13 @@ interface TBManagerInterface {
      * 关闭按键事件拦截
      */
     public void closeKeyIntercept();
+
+    /**
+     * 按键事件拦截是否打开
+     *
+     * @return true：打开，false：关闭
+     */
+    public boolean keyInterceptIsOpen();
 
     /**
      * 其它扩展设备控制

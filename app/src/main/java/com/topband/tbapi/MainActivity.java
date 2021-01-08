@@ -1,7 +1,10 @@
 package com.topband.tbapi;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,6 +21,7 @@ import android.widget.ToggleButton;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.topband.tbapi.utils.AppUtils;
+import com.topband.tbapi.utils.ShellUtils;
 
 import java.io.File;
 
@@ -26,6 +30,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener, SeekBar.OnSeekBarChangeListener {
+    private static final String TAG = "MainActivity";
 
     @BindView(R.id.tv_api_version)
     TextView mApiVersionTv;
@@ -57,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     Button mSetWatchdogTimeoutBtn;
     @BindView(R.id.btn_get_watchdog_timeout)
     Button mGetWatchdogTimeoutBtn;
-    @BindView(R.id.tv_watchdog_timeout)
-    TextView mWatchdogTimeoutTv;
     @BindView(R.id.btn_screenshot)
     Button mScreenshotBtn;
     @BindView(R.id.btn_rotation)
@@ -119,8 +122,31 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     ToggleButton mGpioBtn;
     @BindView(R.id.btn_get_gpio)
     Button mGetGpioBtn;
+    @BindView(R.id.tv_camera)
+    TextView mCameraTv;
+    @BindView(R.id.btn_refresh_camera)
+    Button mRefreshCameraBtn;
+    @BindView(R.id.btn_log2file)
+    ToggleButton mLog2fileBtn;
+    @BindView(R.id.btn_set_log2file_num)
+    Button mSetLog2fileNumBtn;
+    @BindView(R.id.btn_get_log2file_num)
+    Button mGetLog2fileNumBtn;
+    @BindView(R.id.tv_log_path)
+    TextView mLogPathTv;
+    @BindView(R.id.btn_shell_cmd)
+    Button mShellCmdBtn;
+    @BindView(R.id.tv_shell_cmd)
+    TextView mShellCmdTv;
+    @BindView(R.id.btn_4g_keeplive)
+    ToggleButton m4gKeepliveBtn;
+    @BindView(R.id.btn_key_intercept)
+    ToggleButton mKeyInterceptBtn;
+    @BindView(R.id.btn_silent_install)
+    Button mSilentInstallBtn;
 
     private TBManager mTBManager;
+    private Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,12 +154,21 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mHandler = new Handler(getMainLooper());
+
         mTBManager = new TBManager(this);
         mTBManager.init();
 
-        init();
+        // 延时1秒，等特TBManager初始化完成
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                init();
+            }
+        }, 1000);
     }
 
+    @SuppressLint("DefaultLocale")
     private void init() {
         mApiVersionTv.setText(mTBManager.getAPIVersion());
         mAndroidVersionTv.setText(mTBManager.getAndroidVersion());
@@ -146,6 +181,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
         mWatchdogBtn.setChecked(mTBManager.watchdogIsOpen());
         mWatchdogBtn.setOnCheckedChangeListener(this);
+        mGetWatchdogTimeoutBtn.setText(String.format("获取看门狗超时(%d秒)",
+                mTBManager.getWatchdogTimeout()));
 
         mRotationBtn.setText(String.format("旋转屏幕(%d)", mTBManager.getRotation()));
         mStatusbarBtn.setChecked(mTBManager.isStatusBarShow());
@@ -228,13 +265,30 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             mGpioDirectionBtn.setEnabled(false);
             mGpioBtn.setEnabled(false);
         }
+
+        // 初始化日志写文件
+        Log.w(TAG, "mTBManager.isLog2fileOpen(): " + mTBManager.isLog2fileOpen());
+        mLog2fileBtn.setChecked(mTBManager.isLog2fileOpen());
+        mLog2fileBtn.setOnCheckedChangeListener(this);
+        mGetLog2fileNumBtn.setText(String.format("获取最大日志文件数(%d)",
+                mTBManager.getLogFileNum()));
+        mLogPathTv.setText(mTBManager.getLogFilePath());
+
+        // 其它
+        m4gKeepliveBtn.setChecked(mTBManager.keepLiveIsOpen());
+        m4gKeepliveBtn.setOnCheckedChangeListener(this);
+        mKeyInterceptBtn.setChecked(mTBManager.keyInterceptIsOpen());
+        mKeyInterceptBtn.setOnCheckedChangeListener(this);
     }
 
+    @SuppressLint("DefaultLocale")
     @OnClick({R.id.btn_shutdown, R.id.btn_reboot, R.id.btn_timing_switch,
             R.id.btn_watchdog_feed, R.id.btn_set_watchdog_timeout, R.id.btn_get_watchdog_timeout,
             R.id.btn_screenshot, R.id.btn_rotation,
             R.id.btn_check_update, R.id.btn_install_update, R.id.btn_verity_update, R.id.btn_delete_update,
-            R.id.btn_set_ip, R.id.btn_gpio, R.id.btn_get_gpio})
+            R.id.btn_set_ip, R.id.btn_gpio, R.id.btn_get_gpio, R.id.btn_refresh_camera,
+            R.id.btn_set_log2file_num, R.id.btn_get_log2file_num,
+            R.id.btn_shell_cmd, R.id.btn_silent_install})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_shutdown:
@@ -253,7 +307,8 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 mTBManager.setWatchdogTimeout(mTBManager.getWatchdogTimeout() + 1);
                 break;
             case R.id.btn_get_watchdog_timeout:
-                mWatchdogTimeoutTv.setText(mTBManager.getWatchdogTimeout() + "秒");
+                mGetWatchdogTimeoutBtn.setText(String.format("获取看门狗超时(%d秒)",
+                        mTBManager.getWatchdogTimeout()));
                 break;
             case R.id.btn_screenshot:
                 mTBManager.screenshot("");
@@ -264,18 +319,39 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             case R.id.btn_check_update:
                 mTBManager.checkUpdate();
                 break;
-            case R.id.btn_install_update:
-                mTBManager.installPackage(AppUtils.getRootDir(this)
+            case R.id.btn_install_update: {
+                File pkgFile = new File(AppUtils.getRootDir(this)
                         + File.separator + "update.zip");
+                if (pkgFile.exists()) {
+                    mTBManager.installPackage(pkgFile.getAbsolutePath());
+                } else {
+                    Toast.makeText(this, pkgFile.getAbsolutePath() + "文件不存在",
+                            Toast.LENGTH_SHORT).show();
+                }
                 break;
-            case R.id.btn_verity_update:
-                mTBManager.verifyPackage(AppUtils.getRootDir(this)
+            }
+            case R.id.btn_verity_update: {
+                File pkgFile = new File(AppUtils.getRootDir(this)
                         + File.separator + "update.zip");
+                if (pkgFile.exists()) {
+                    mTBManager.verifyPackage(pkgFile.getAbsolutePath());
+                } else {
+                    Toast.makeText(this, pkgFile.getAbsolutePath() + "文件不存在",
+                            Toast.LENGTH_SHORT).show();
+                }
                 break;
-            case R.id.btn_delete_update:
-                mTBManager.deletePackage(AppUtils.getRootDir(this)
+            }
+            case R.id.btn_delete_update: {
+                File pkgFile = new File(AppUtils.getRootDir(this)
                         + File.separator + "update.zip");
+                if (pkgFile.exists()) {
+                    mTBManager.deletePackage(pkgFile.getAbsolutePath());
+                } else {
+                    Toast.makeText(this, pkgFile.getAbsolutePath() + "文件不存在",
+                            Toast.LENGTH_SHORT).show();
+                }
                 break;
+            }
             case R.id.btn_set_ip:
                 String ip = mEthIpEdt.getText().toString();
                 String mask = mEthMaskEdt.getText().toString();
@@ -299,6 +375,40 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                 break;
             case R.id.btn_get_gpio:
                 mGpioBtn.setChecked(mTBManager.getGpio(mGpioSpn.getSelectedItemPosition()) > 0);
+                break;
+            case R.id.btn_refresh_camera:
+                mCameraTv.setText("");
+                for (int i = 0; i < 10; i++) {
+                    String value = AppUtils.getProperty("topband.dev.video" + i, "");
+                    if (TextUtils.isEmpty(value)) {
+                        break;
+                    }
+                    String[] ids = value.split(":");
+                    int id = mTBManager.getUVCCameraIndex(ids[0], ids[1]);
+                    mCameraTv.append(id + " -> " + value + "\n");
+                }
+                break;
+            case R.id.btn_set_log2file_num:
+                mTBManager.setLogFileNum(mTBManager.getLogFileNum() + 1);
+                break;
+            case R.id.btn_get_log2file_num:
+                mGetLog2fileNumBtn.setText(String.format("获取最大日志文件数(%d)",
+                        mTBManager.getLogFileNum()));
+                break;
+            case R.id.btn_shell_cmd:
+                ShellUtils.CommandResult result = mTBManager.execCmd("uname -a", false);
+                mShellCmdTv.setText("$ uname -a\n");
+                mShellCmdTv.append(result.toString());
+                break;
+            case R.id.btn_silent_install:
+                File apkFile = new File(AppUtils.getRootDir(this)
+                        + File.separator + "test.apk");
+                if (apkFile.exists()) {
+                    mTBManager.silentInstall(apkFile.getAbsolutePath());
+                } else {
+                    Toast.makeText(this, apkFile.getAbsolutePath() + "文件不存在",
+                            Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }
@@ -360,6 +470,27 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                     mTBManager.setGpioDirection(mGpioSpn.getSelectedItemPosition(), 0, 0);
                     mGetGpioBtn.setEnabled(true);
                     mGpioBtn.setEnabled(false);
+                }
+                break;
+            case R.id.btn_log2file:
+                if (b) {
+                    mTBManager.openLog2file();
+                } else {
+                    mTBManager.closeLog2file();
+                }
+                break;
+            case R.id.btn_4g_keeplive:
+                if (b) {
+                    mTBManager.open4gKeepLive();
+                } else {
+                    mTBManager.close4gKeepLive();
+                }
+                break;
+            case R.id.btn_key_intercept:
+                if (b) {
+                    mTBManager.openKeyIntercept();
+                } else {
+                    mTBManager.closeKeyIntercept();
                 }
                 break;
         }

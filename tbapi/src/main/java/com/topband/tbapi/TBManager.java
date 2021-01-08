@@ -799,6 +799,18 @@ public class TBManager implements TBManagerInterface {
     }
 
     @Override
+    public boolean keepLiveIsOpen() {
+        if (mModemService != null) {
+            try {
+                return mModemService.keepLiveIsOpen();
+            } catch (RemoteException e) {
+                Log.e(TAG, "keepLiveIsOpen, " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    @Override
     public void openKeyIntercept() {
         if (mKeyInterceptService != null) {
             try {
@@ -818,6 +830,18 @@ public class TBManager implements TBManagerInterface {
                 Log.e(TAG, "closeKeyIntercept, " + e.getMessage());
             }
         }
+    }
+
+    @Override
+    public boolean keyInterceptIsOpen() {
+        if (mKeyInterceptService != null) {
+            try {
+                return mKeyInterceptService.isOpen();
+            } catch (RemoteException e) {
+                Log.e(TAG, "keyInterceptIsOpen, " + e.getMessage());
+            }
+        }
+        return false;
     }
 
     @Override

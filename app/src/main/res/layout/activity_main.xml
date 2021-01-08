@@ -249,18 +249,6 @@
                     android:layout_height="wrap_content"
                     android:text="获取看门狗超时" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:text="看门狗超时时长："/>
-
-                <TextView
-                    android:id="@+id/tv_watchdog_timeout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"/>
-
             </com.google.android.flexbox.FlexboxLayout>
 
             <TextView
@@ -693,6 +681,136 @@
                     android:layout_height="wrap_content"
                     android:textOff="LOW"
                     android:textOn="HIGHT" />
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="摄像头" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_group"
+                android:padding="5dp">
+
+                <Button
+                    android:id="@+id/btn_refresh_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="刷新"/>
+
+                <TextView
+                    android:id="@+id/tv_camera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="日志" />
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_group"
+                android:padding="5dp"
+                app:alignContent="stretch"
+                app:alignItems="stretch"
+                app:flexWrap="wrap">
+
+                <ToggleButton
+                    android:id="@+id/btn_log2file"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="日志写文件"
+                    android:textOn="日志写文件" />
+
+                <Button
+                    android:id="@+id/btn_set_log2file_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="设置最大日志文件数(+1)" />
+
+                <Button
+                    android:id="@+id/btn_get_log2file_num"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="获取最大日志文件数" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="日志路径："/>
+
+                <TextView
+                    android:id="@+id/tv_log_path"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"/>
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="其它" />
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_group"
+                android:padding="5dp"
+                app:alignContent="stretch"
+                app:alignItems="stretch"
+                app:flexWrap="wrap">
+                
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical">
+
+                    <Button
+                        android:id="@+id/btn_shell_cmd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="执行Shell命令(uname -a)" />
+
+                    <TextView
+                        android:id="@+id/tv_shell_cmd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
+                <ToggleButton
+                    android:id="@+id/btn_4g_keeplive"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="4G保活"
+                    android:textOn="4G保活" />
+
+                <ToggleButton
+                    android:id="@+id/btn_key_intercept"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="事件拦截"
+                    android:textOn="事件拦截" />
+
+                <Button
+                    android:id="@+id/btn_silent_install"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="静默安装" />
 
             </com.google.android.flexbox.FlexboxLayout>
 
