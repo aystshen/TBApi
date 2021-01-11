@@ -284,8 +284,8 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public boolean setTimingSwitch(String offDate, String offTime,
-                                   String onDate, String onTime,
+    public boolean setTimingSwitch(String offDate, @NonNull String offTime,
+                                   String onDate, @NonNull String onTime,
                                    boolean enable) {
         try {
             JSONObject param = new JSONObject();
@@ -434,14 +434,14 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public int getScreenWidth(Activity context) {
+    public int getScreenWidth(@NonNull Activity context) {
         Point size = new Point();
         context.getWindowManager().getDefaultDisplay().getRealSize(size);
         return size.x;
     }
 
     @Override
-    public int getScreenHeight(Activity context) {
+    public int getScreenHeight(@NonNull Activity context) {
         Point size = new Point();
         context.getWindowManager().getDefaultDisplay().getRealSize(size);
         return size.y;
@@ -521,7 +521,7 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public boolean installPackage(String packagePath) {
+    public boolean installPackage(@NonNull String packagePath) {
         if (null != mRomUpgradeService) {
             try {
                 return mRomUpgradeService.installPackage(packagePath);
@@ -534,7 +534,7 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public boolean verifyPackage(String packagePath) {
+    public boolean verifyPackage(@NonNull String packagePath) {
         if (null != mRomUpgradeService) {
             try {
                 return mRomUpgradeService.verifyPackage(packagePath);
@@ -547,7 +547,7 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public void deletePackage(String packagePath) {
+    public void deletePackage(@NonNull String packagePath) {
         if (null != mRomUpgradeService) {
             try {
                 mRomUpgradeService.deletePackage(packagePath);
@@ -612,7 +612,10 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public void setEthIp(String ip, String mask, String gateway, String dns) {
+    public void setEthIp(@NonNull String ip,
+                         @NonNull String mask,
+                         @NonNull String gateway,
+                         @NonNull String dns) {
         //TODO
     }
 
@@ -646,7 +649,7 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public void unmountVolume(String path, boolean force, boolean removeEncryption) {
+    public void unmountVolume(@NonNull String path, boolean force, boolean removeEncryption) {
         //TODO
     }
 
@@ -748,7 +751,7 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public int getUVCCameraIndex(String vid, String pid) {
+    public int getUVCCameraIndex(@NonNull String vid, @NonNull String pid) {
         for (int i = 0; i < 10; i++) {
             if (TextUtils.equals(
                     SystemUtils.getProperty("topband.dev.video" + i, ""),
@@ -823,7 +826,7 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public ShellUtils.CommandResult execCmd(String cmd, boolean root) {
+    public ShellUtils.CommandResult execCmd(@NonNull String cmd, boolean root) {
         return ShellUtils.execCmd(cmd, root);
     }
 
@@ -901,13 +904,9 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public void silentInstall(String path) {
-        if (!TextUtils.isEmpty(path)) {
-            if (!InstallUtils.installSilent(path)) {
-                InstallUtils.install(mContext, path);
-            }
-        } else {
-            Log.e(TAG, "silentInstall, path is null");
+    public void silentInstall(@NonNull String path) {
+        if (!InstallUtils.installSilent(path)) {
+            InstallUtils.install(mContext, path);
         }
     }
 }
