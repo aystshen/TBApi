@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +23,9 @@ import com.topband.tbapi.utils.AppUtils;
 import com.topband.tbapi.utils.ShellUtils;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -293,7 +295,14 @@ public class MainActivity extends AppCompatActivity implements
                 mTBManager.reboot();
                 break;
             case R.id.btn_timing_switch:
-                mTBManager.setTimingSwitch("", "", "", "", false);
+                long time = System.currentTimeMillis();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+                String offDate = dateFormat.format(new Date(time+360*1000)); // 5分钟后关机
+                String offTime = timeFormat.format(new Date(time+360*1000)); // 5分钟后关机
+                String onDate = dateFormat.format(new Date(time+660*1000)); // 6分钟后开机
+                String onTime = timeFormat.format(new Date(time+660*1000)); // 6分钟后开机
+                mTBManager.setTimingSwitch(offDate, offTime, onDate, onTime, true);
                 break;
             case R.id.btn_watchdog_feed:
                 mTBManager.watchdogFeed();

@@ -19,14 +19,20 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.ayst.androidx.IKeyInterceptService;
 import com.ayst.androidx.ILog2fileService;
 import com.ayst.androidx.IModemService;
+import com.ayst.androidx.ITimeRTCService;
 import com.ayst.romupgrade.IRomUpgradeService;
 import com.topband.tbapi.utils.DeviceInfoUtils;
 import com.topband.tbapi.utils.InstallUtils;
 import com.topband.tbapi.utils.ShellUtils;
 import com.topband.tbapi.utils.SystemUtils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -53,6 +59,7 @@ public class TBManager implements ITBManager {
     private ILog2fileService mLog2fileService;
     private IModemService mModemService;
     private IKeyInterceptService mKeyInterceptService;
+    private ITimeRTCService mTimingSwitchService;
 
     public TBManager(Context context) {
         mContext = context;
@@ -107,6 +114,11 @@ public class TBManager implements ITBManager {
         intent.setPackage("com.ayst.androidx");
         intent.setAction("com.ayst.androidx.KEY_INTERCEPT_SERVICE");
         mContext.bindService(intent, mKeyInterceptServiceConnection, Context.BIND_AUTO_CREATE);
+
+        intent = new Intent();
+        intent.setPackage("com.ayst.androidx");
+        intent.setAction("com.ayst.androidx.TIMERTC_SREVICE");
+        mContext.bindService(intent, mTimingSwitchServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
@@ -119,6 +131,7 @@ public class TBManager implements ITBManager {
         mContext.unbindService(mLog2fileServiceConnection);
         mContext.unbindService(mModemServiceConnection);
         mContext.unbindService(mKeyInterceptServiceConnection);
+        mContext.unbindService(mTimingSwitchServiceConnection);
     }
 
     /**
@@ -186,6 +199,23 @@ public class TBManager implements ITBManager {
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "IKeyInterceptService, onServiceDisconnected...");
             mKeyInterceptService = null;
+        }
+    };
+
+    /**
+     * 定时开关机Service Connection
+     */
+    private ServiceConnection mTimingSwitchServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "ITimeRTCService, onServiceConnected...");
+            mTimingSwitchService = ITimeRTCService.Stub.asInterface(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "ITimeRTCService, onServiceDisconnected...");
+            mTimingSwitchService = null;
         }
     };
 
@@ -257,7 +287,28 @@ public class TBManager implements ITBManager {
     public boolean setTimingSwitch(String offDate, String offTime,
                                    String onDate, String onTime,
                                    boolean enable) {
-        //TODO
+        try {
+            JSONObject param = new JSONObject();
+            param.put("cmd", enable ? "1" : "0");
+            param.put("off_date", offDate);
+            param.put("off_time", offTime);
+            param.put("on_date", onDate);
+            param.put("on_time", onTime);
+            if (mTimingSwitchService != null) {
+                try {
+                    int ret = mTimingSwitchService.updateTimeToRtc(param.toString());
+                    if (ret < 0) {
+                        Log.e(TAG, "setTimingSwitch, error: " + ret);
+                    } else {
+                        return true;
+                    }
+                } catch (RemoteException e) {
+                    Log.e(TAG, "setTimingSwitch, " + e.getMessage());
+                }
+            }
+        } catch (JSONException e) {
+            Log.e(TAG, "setTimingSwitch, " + e.getMessage());
+        }
         return false;
     }
 
