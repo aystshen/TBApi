@@ -2,6 +2,8 @@ package com.topband.tbapi;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+
 import com.topband.tbapi.utils.ShellUtils;
 
 interface ITBManager {
@@ -147,7 +149,7 @@ interface ITBManager {
     /**
      * 截屏并保存为png图片格式到指定位置
      *
-     * @param path 截屏保存文件路径
+     * @param path 截屏保存文件路径（例如：/sdcard/screenshot.png）
      */
     public void screenshot(String path);
 

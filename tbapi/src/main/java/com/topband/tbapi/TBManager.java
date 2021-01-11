@@ -405,8 +405,8 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public void screenshot(String path) {
-        //TODO
+    public void screenshot(@NonNull String path) {
+        ShellUtils.execCmd("screencap -p " + path, false);
     }
 
     @Override

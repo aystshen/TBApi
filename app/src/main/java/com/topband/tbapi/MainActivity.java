@@ -315,7 +315,11 @@ public class MainActivity extends AppCompatActivity implements
                         mTBManager.getWatchdogTimeout()));
                 break;
             case R.id.btn_screenshot:
-                mTBManager.screenshot("");
+                String screenshot = AppUtils.getRootDir(this)
+                        + File.separator + "screenshot.png";
+                mTBManager.screenshot(screenshot);
+                Toast.makeText(this, "已截屏保存至：" + screenshot,
+                        Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_rotation:
                 mTBManager.setRotation((mTBManager.getRotation() + 90) % 360, true);
