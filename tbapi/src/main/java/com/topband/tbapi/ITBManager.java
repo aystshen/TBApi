@@ -363,15 +363,6 @@ interface ITBManager {
     public void unmountVolume(String path, boolean force, boolean removeEncryption);
 
     /**
-     * 获取串口设备文件绝对路径
-     *
-     * @param num 串口号（取值：0~N）
-     * @return 串口设备文件绝对路径
-     * 例如：/dev/ttyS0
-     */
-    public String getUartPath(int num);
-
-    /**
      * 设置GPIO输出电平
      *
      * @param gpio  GPIO序号（取值：0~N）

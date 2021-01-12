@@ -618,11 +618,11 @@ public class TBManager implements ITBManager {
 
     @Override
     public boolean setEthIp(String ip,
-                         String netmask,
-                         String gateway,
-                         String dns1,
-                         String dns2,
-                         @NonNull String mode) {
+                            String netmask,
+                            String gateway,
+                            String dns1,
+                            String dns2,
+                            @NonNull String mode) {
         return mEthernetHelper.setIp(ip, netmask, gateway, dns1, dns2, mode);
     }
 
@@ -652,11 +652,6 @@ public class TBManager implements ITBManager {
     @Override
     public void unmountVolume(@NonNull String path, boolean force, boolean removeEncryption) {
         //TODO
-    }
-
-    @Override
-    public String getUartPath(int num) {
-        return "/dev/ttyS" + num;
     }
 
     @Override
