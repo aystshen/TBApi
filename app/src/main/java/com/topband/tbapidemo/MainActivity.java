@@ -1,4 +1,4 @@
-package com.topband.tbapi;
+package com.topband.tbapidemo;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -19,7 +19,8 @@ import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.topband.tbapi.utils.AppUtils;
+import com.topband.tbapi.TBManager;
+import com.topband.tbapidemo.utils.AppUtils;
 import com.topband.tbapi.utils.ShellUtils;
 
 import java.io.File;

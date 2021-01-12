@@ -1,4 +1,4 @@
-package com.topband.tbapi;
+package com.topband.tbapidemo;
 
 import org.junit.Test;
 
