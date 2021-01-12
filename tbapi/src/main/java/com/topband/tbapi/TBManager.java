@@ -27,6 +27,7 @@ import com.ayst.androidx.IModemService;
 import com.ayst.androidx.ITimeRTCService;
 import com.ayst.romupgrade.IRomUpgradeService;
 import com.topband.tbapi.utils.DeviceInfoUtils;
+import com.topband.tbapi.utils.EthernetHelper;
 import com.topband.tbapi.utils.InstallUtils;
 import com.topband.tbapi.utils.ShellUtils;
 import com.topband.tbapi.utils.SystemUtils;
@@ -60,6 +61,7 @@ public class TBManager implements ITBManager {
     private IModemService mModemService;
     private IKeyInterceptService mKeyInterceptService;
     private ITimeRTCService mTimingSwitchService;
+    private EthernetHelper mEthernetHelper;
 
     public TBManager(Context context) {
         mContext = context;
@@ -71,6 +73,8 @@ public class TBManager implements ITBManager {
     @SuppressLint("PrivateApi")
     public void init() {
         Log.i(TAG, "init, API Version: " + VERSION);
+
+        mEthernetHelper = new EthernetHelper(mContext);
 
         // 获取MCU Service
         Method method = null;
@@ -589,45 +593,42 @@ public class TBManager implements ITBManager {
 
     @Override
     public String getEthIp() {
-        //TODO
-        return "192.168.0.100";
+        return mEthernetHelper.getIp();
     }
 
     @Override
-    public String getEthMask() {
-        //TODO
-        return "255.255.255.0";
+    public String getEthNetmask() {
+        return mEthernetHelper.getNetmask();
     }
 
     @Override
     public String getEthGateway() {
-        //TODO
-        return "192.168.0.1";
+        return mEthernetHelper.getGateway();
     }
 
     @Override
-    public String getEthDns() {
-        //TODO
-        return "8.8.8.8";
+    public String getEthDns1() {
+        return mEthernetHelper.getDns1();
     }
 
     @Override
-    public void setEthIp(@NonNull String ip,
-                         @NonNull String mask,
-                         @NonNull String gateway,
-                         @NonNull String dns) {
-        //TODO
+    public String getEthDns2() {
+        return mEthernetHelper.getDns2();
+    }
+
+    @Override
+    public boolean setEthIp(String ip,
+                         String netmask,
+                         String gateway,
+                         String dns1,
+                         String dns2,
+                         @NonNull String mode) {
+        return mEthernetHelper.setIp(ip, netmask, gateway, dns1, dns2, mode);
     }
 
     @Override
     public boolean isDhcp() {
-        //TODO
-        return true;
-    }
-
-    @Override
-    public void setDhcp(boolean enable) {
-        //TODO
+        return TextUtils.equals("DHCP", mEthernetHelper.getIpAssignment());
     }
 
     @Override

@@ -559,10 +559,29 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="DNS：" />
+                        android:text="DNS1：" />
 
                     <EditText
-                        android:id="@+id/edt_eth_dns"
+                        android:id="@+id/edt_eth_dns1"
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:digits="0123456789."/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DNS2：" />
+
+                    <EditText
+                        android:id="@+id/edt_eth_dns2"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:digits="0123456789."/>
@@ -579,15 +598,8 @@
                         android:id="@+id/btn_dhcp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textOff="DHCP"
+                        android:textOff="STATIC"
                         android:textOn="DHCP" />
-
-                    <Button
-                        android:id="@+id/btn_set_ip"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="设置IP"/>
-
                 </LinearLayout>
 
             </LinearLayout>

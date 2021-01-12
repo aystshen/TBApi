@@ -32,6 +32,9 @@ ext {
     minSdkVersion = 21
     targetSdkVersion = 26
 
+    javaSourceCompatibility = JavaVersion.VERSION_1_8
+    javaTargetCompatibility = JavaVersion.VERSION_1_8
+
     keyStoreAlias = properties.getProperty("keystore.alias")
     keyStorePath = properties.getProperty("keystore.path")
     keyStorePassword = properties.getProperty("keystore.store_password")

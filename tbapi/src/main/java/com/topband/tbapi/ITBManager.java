@@ -287,7 +287,7 @@ interface ITBManager {
      *
      * @return 以太网子网掩码
      */
-    public String getEthMask();
+    public String getEthNetmask();
 
     /**
      * 获取以太网网关
@@ -297,21 +297,32 @@ interface ITBManager {
     public String getEthGateway();
 
     /**
-     * 获取以太网DNS
+     * 获取以太网DNS1
      *
-     * @return 以太网DNS
+     * @return 以太网DNS1
      */
-    public String getEthDns();
+    public String getEthDns1();
+
+    /**
+     * 获取以太网DNS2
+     *
+     * @return 以太网DNS2
+     */
+    public String getEthDns2();
 
     /**
      * 设置以太网IP地址
      *
      * @param ip      IP地址
-     * @param mask    子网掩码
+     * @param netmask 子网掩码
      * @param gateway 网关
-     * @param dns     DNS
+     * @param dns1    DNS1
+     * @param dns2    DNS2
+     * @param mode    模式
+     *                STATIC：静态IP（其它参数不能为空）。
+     *                DHCP：动态IP（其它参数可为空）。
      */
-    public void setEthIp(String ip, String mask, String gateway, String dns);
+    public boolean setEthIp(String ip, String netmask, String gateway, String dns1, String dns2, String mode);
 
     /**
      * 判断当前网络类型是DHCP或静态IP
@@ -319,13 +330,6 @@ interface ITBManager {
      * @return true：DHCP，false：静态IP
      */
     public boolean isDhcp();
-
-    /**
-     * 设置DHCP或静态IP
-     *
-     * @param enable true：DHCP，false：静态IP
-     */
-    public void setDhcp(boolean enable);
 
     /**
      * 获取当前连网类型（WiFi、移动网络、有线）

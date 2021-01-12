@@ -23,7 +23,6 @@ import com.topband.tbapi.utils.AppUtils;
 import com.topband.tbapi.utils.ShellUtils;
 
 import java.io.File;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -108,12 +107,12 @@ public class MainActivity extends AppCompatActivity implements
     EditText mEthMaskEdt;
     @BindView(R.id.edt_eth_gateway)
     EditText mEthGatewayEdt;
-    @BindView(R.id.edt_eth_dns)
-    EditText mEthDnsEdt;
+    @BindView(R.id.edt_eth_dns1)
+    EditText mEthDnsEdt1;
+    @BindView(R.id.edt_eth_dns2)
+    EditText mEthDnsEdt2;
     @BindView(R.id.btn_dhcp)
     ToggleButton mDhcpBtn;
-    @BindView(R.id.btn_set_ip)
-    Button mSetIpBtn;
     @BindView(R.id.tv_sdcard_path)
     TextView mSdcardPathTv;
     @BindView(R.id.tv_usb_path)
@@ -214,20 +213,14 @@ public class MainActivity extends AppCompatActivity implements
                 break;
         }
         mDhcpBtn.setChecked(mTBManager.isDhcp());
-        if (mTBManager.isDhcp()) {
-            mSetIpBtn.setEnabled(false);
-            mEthIpEdt.setEnabled(false);
-            mEthMaskEdt.setEnabled(false);
-            mEthGatewayEdt.setEnabled(false);
-            mEthDnsEdt.setEnabled(false);
-        }
         mDhcpBtn.setOnCheckedChangeListener(this);
         mWifiMacTv.setText(mTBManager.getWiFiMac());
         mEthMacTv.setText(mTBManager.getEthMac());
         mEthIpEdt.setText(mTBManager.getEthIp());
-        mEthMaskEdt.setText(mTBManager.getEthMask());
+        mEthMaskEdt.setText(mTBManager.getEthNetmask());
         mEthGatewayEdt.setText(mTBManager.getEthGateway());
-        mEthDnsEdt.setText(mTBManager.getEthDns());
+        mEthDnsEdt1.setText(mTBManager.getEthDns1());
+        mEthDnsEdt2.setText(mTBManager.getEthDns2());
 
         // 存储
         mSdcardPathTv.setText(mTBManager.getSdcardPath());
@@ -283,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements
     @OnClick({R.id.btn_shutdown, R.id.btn_reboot, R.id.btn_timing_switch, R.id.btn_watchdog_feed,
             R.id.btn_set_watchdog_timeout, R.id.btn_get_watchdog_timeout, R.id.btn_screenshot,
             R.id.btn_rotation, R.id.btn_check_update, R.id.btn_install_update, R.id.btn_verity_update,
-            R.id.btn_delete_update, R.id.btn_set_ip, R.id.btn_gpio, R.id.btn_get_gpio,
+            R.id.btn_delete_update, R.id.btn_gpio, R.id.btn_get_gpio,
             R.id.btn_refresh_camera, R.id.btn_set_log2file_num, R.id.btn_get_log2file_num,
             R.id.btn_shell_cmd, R.id.btn_silent_install})
     public void onViewClicked(View view) {
@@ -360,21 +353,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 break;
             }
-            case R.id.btn_set_ip:
-                String ip = mEthIpEdt.getText().toString();
-                String mask = mEthMaskEdt.getText().toString();
-                String gateway = mEthGatewayEdt.getText().toString();
-                String dns = mEthDnsEdt.getText().toString();
-                if (!TextUtils.isEmpty(ip)
-                        && !TextUtils.isEmpty(mask)
-                        && !TextUtils.isEmpty(gateway)
-                        && !TextUtils.isEmpty(dns)) {
-                    mTBManager.setEthIp(ip, mask, gateway, dns);
-                } else {
-                    Toast.makeText(this, "请输入IP地址、子网掩码、网关、DNS！",
-                            Toast.LENGTH_SHORT).show();
-                }
-                break;
             case R.id.btn_gpio:
                 if (mGpioDirectionBtn.isChecked()) {
                     mTBManager.setGpio(mGpioSpn.getSelectedItemPosition(),
@@ -454,19 +432,22 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.btn_dhcp:
                 if (b) {
-                    mTBManager.setDhcp(true);
-                    mSetIpBtn.setEnabled(false);
-                    mEthIpEdt.setEnabled(false);
-                    mEthMaskEdt.setEnabled(false);
-                    mEthGatewayEdt.setEnabled(false);
-                    mEthDnsEdt.setEnabled(false);
+                    mTBManager.setEthIp(null, null, null, null, null, "DHCP");
                 } else {
-                    mTBManager.setDhcp(false);
-                    mSetIpBtn.setEnabled(true);
-                    mEthIpEdt.setEnabled(true);
-                    mEthMaskEdt.setEnabled(true);
-                    mEthGatewayEdt.setEnabled(true);
-                    mEthDnsEdt.setEnabled(true);
+                    String ip = mEthIpEdt.getText().toString();
+                    String mask = mEthMaskEdt.getText().toString();
+                    String gateway = mEthGatewayEdt.getText().toString();
+                    String dns1 = mEthDnsEdt1.getText().toString();
+                    String dns2 = mEthDnsEdt2.getText().toString();
+                    if (!TextUtils.isEmpty(ip)
+                            && !TextUtils.isEmpty(mask)
+                            && !TextUtils.isEmpty(gateway)
+                            && !TextUtils.isEmpty(dns1)) {
+                        mTBManager.setEthIp(ip, mask, gateway, dns1, dns2, "STATIC");
+                    } else {
+                        Toast.makeText(this, "请输入IP地址、子网掩码、网关、DNS！",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
             case R.id.btn_gpio_direction:
