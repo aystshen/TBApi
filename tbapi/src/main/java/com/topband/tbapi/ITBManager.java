@@ -2,8 +2,6 @@ package com.topband.tbapi;
 
 import android.app.Activity;
 
-import androidx.annotation.NonNull;
-
 import com.topband.tbapi.utils.ShellUtils;
 
 interface ITBManager {
