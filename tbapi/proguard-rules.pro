@@ -20,4 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.topband.tbapi.**{*;}
+-keep class com.topband.tbapi.** {*;}
+-keep class com.ayst.androidx.** {*;}
+-keep class android.os.**{*;}
