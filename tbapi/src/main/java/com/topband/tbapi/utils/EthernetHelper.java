@@ -169,17 +169,9 @@ public class EthernetHelper {
                          String dnsStr1,
                          String dnsStr2,
                          @NonNull String mode) {
-        if (TextUtils.equals(mode, "STATIC")) {
-            if (TextUtils.isEmpty(ipStr)
-            || TextUtils.isEmpty(netmaskStr)
-            || TextUtils.isEmpty(gatewayStr)
-            || TextUtils.isEmpty(dnsStr1)) {
-                Log.e(TAG, "setIp, STATIC mode, ip, mask or dns is null");
-                return false;
-            }
-        } else if (TextUtils.equals(mode, "DHCP")) {
 
-        } else {
+        if (!TextUtils.equals(mode, "STATIC")
+            && !TextUtils.equals(mode, "DHCP")) {
             Log.e(TAG, "setIp, mode not supported");
             return false;
         }
@@ -267,6 +259,7 @@ public class EthernetHelper {
                     Method method = mEthManagerObj.getClass().getDeclaredMethod("setConfiguration", ipcClazz);
                     method.setAccessible(true);
                     method.invoke(mEthManagerObj, ipcInstance);
+                    break;
                 }
             }
         } catch (Exception e) {
