@@ -172,6 +172,12 @@ public class MainActivity extends AppCompatActivity implements
         }, 1000);
     }
 
+    @Override
+    protected void onDestroy() {
+        mTBManager.deinit();
+        super.onDestroy();
+    }
+
     @SuppressLint("DefaultLocale")
     private void init() {
         // 系统信息
