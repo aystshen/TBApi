@@ -78,7 +78,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.1.0'
 
     // TBApi
-    implementation 'com.topband.tbapi:tbapi:1.0.0'
+    implementation 'com.topband.tbapi:tbapi:1.0.1'
 }
 
 def releaseTime() {

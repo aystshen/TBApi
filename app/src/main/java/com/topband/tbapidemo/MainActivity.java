@@ -20,8 +20,8 @@ import android.widget.ToggleButton;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.topband.tbapi.TBManager;
-import com.topband.tbapidemo.utils.AppUtils;
 import com.topband.tbapi.utils.ShellUtils;
+import com.topband.tbapidemo.utils.AppUtils;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -148,6 +148,18 @@ public class MainActivity extends AppCompatActivity implements
     ToggleButton mKeyInterceptBtn;
     @BindView(R.id.btn_silent_install)
     Button mSilentInstallBtn;
+    @BindView(R.id.rdo_wiegand_read_26)
+    RadioButton mWiegandRead26Rdo;
+    @BindView(R.id.rdo_wiegand_read_34)
+    RadioButton mWiegandRead34Rdo;
+    @BindView(R.id.rdo_wiegand_write_26)
+    RadioButton mWiegandWrite26Rdo;
+    @BindView(R.id.rdo_wiegand_write_34)
+    RadioButton mWiegandWrite34Rdo;
+    @BindView(R.id.btn_wiegand_read)
+    Button mWiegandReadBtn;
+    @BindView(R.id.btn_wiegand_write)
+    Button mWiegandWriteBtn;
 
     private TBManager mTBManager;
     private Handler mHandler;
@@ -277,6 +289,17 @@ public class MainActivity extends AppCompatActivity implements
         m4gKeepliveBtn.setOnCheckedChangeListener(this);
         mKeyInterceptBtn.setChecked(mTBManager.keyInterceptIsOpen());
         mKeyInterceptBtn.setOnCheckedChangeListener(this);
+
+        // 韦根
+        mTBManager.setWiegandReadFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_26);
+        mWiegandRead26Rdo.setChecked(true);
+        mTBManager.setWiegandWriteFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_26);
+        mWiegandWrite26Rdo.setChecked(true);
+
+        mWiegandRead26Rdo.setOnCheckedChangeListener(this);
+        mWiegandRead34Rdo.setOnCheckedChangeListener(this);
+        mWiegandWrite26Rdo.setOnCheckedChangeListener(this);
+        mWiegandWrite34Rdo.setOnCheckedChangeListener(this);
     }
 
     @SuppressLint("DefaultLocale")
@@ -285,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements
             R.id.btn_rotation, R.id.btn_check_update, R.id.btn_install_update, R.id.btn_verity_update,
             R.id.btn_delete_update, R.id.btn_gpio, R.id.btn_get_gpio,
             R.id.btn_refresh_camera, R.id.btn_set_log2file_num, R.id.btn_get_log2file_num,
-            R.id.btn_shell_cmd, R.id.btn_silent_install})
+            R.id.btn_shell_cmd, R.id.btn_silent_install, R.id.btn_wiegand_read, R.id.btn_wiegand_write})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_shutdown:
@@ -298,10 +321,10 @@ public class MainActivity extends AppCompatActivity implements
                 long time = System.currentTimeMillis();
                 SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-                String offDate = dateFormat.format(new Date(time+360*1000)); // 5分钟后关机
-                String offTime = timeFormat.format(new Date(time+360*1000)); // 5分钟后关机
-                String onDate = dateFormat.format(new Date(time+660*1000)); // 6分钟后开机
-                String onTime = timeFormat.format(new Date(time+660*1000)); // 6分钟后开机
+                String offDate = dateFormat.format(new Date(time + 360 * 1000)); // 5分钟后关机
+                String offTime = timeFormat.format(new Date(time + 360 * 1000)); // 5分钟后关机
+                String onDate = dateFormat.format(new Date(time + 660 * 1000)); // 6分钟后开机
+                String onTime = timeFormat.format(new Date(time + 660 * 1000)); // 6分钟后开机
                 mTBManager.setTimingSwitch(offDate, offTime, onDate, onTime, true);
                 break;
             case R.id.btn_watchdog_feed:
@@ -403,6 +426,13 @@ public class MainActivity extends AppCompatActivity implements
                             Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case R.id.btn_wiegand_read:
+                mWiegandReadBtn.setText(String.format("韦根读(0x%08x)",
+                        mTBManager.wiegandRead()));
+                break;
+            case R.id.btn_wiegand_write:
+                mTBManager.wiegandWrite(0x00776677); // 0x00776677 为固定的测试数据
+                break;
         }
     }
 
@@ -487,6 +517,26 @@ public class MainActivity extends AppCompatActivity implements
                     mTBManager.openKeyIntercept();
                 } else {
                     mTBManager.closeKeyIntercept();
+                }
+                break;
+            case R.id.rdo_wiegand_read_26:
+                if (b) {
+                    mTBManager.setWiegandReadFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_26);
+                }
+                break;
+            case R.id.rdo_wiegand_read_34:
+                if (b) {
+                    mTBManager.setWiegandReadFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_34);
+                }
+                break;
+            case R.id.rdo_wiegand_write_26:
+                if (b) {
+                    mTBManager.setWiegandWriteFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_26);
+                }
+                break;
+            case R.id.rdo_wiegand_write_34:
+                if (b) {
+                    mTBManager.setWiegandWriteFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_34);
                 }
                 break;
         }
