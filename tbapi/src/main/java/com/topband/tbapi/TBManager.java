@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.os.IGpioService;
 import android.os.IMcuService;
+import android.os.IWiegandService;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -45,7 +46,7 @@ public class TBManager implements ITBManager {
     private static final String TAG = "TBManager";
 
     // API版本
-    private static final String VERSION = "1.0.0";
+    private static final String VERSION = "1.0.1";
 
     // 屏幕旋转角度
     public static final int SCREEN_ANGLE_0 = 0;
@@ -53,9 +54,15 @@ public class TBManager implements ITBManager {
     public static final int SCREEN_ANGLE_180 = 180;
     public static final int SCREEN_ANGLE_270 = 270;
 
+    public enum WiegandFormat {
+        WIEGAND_FORMAT_26,
+        WIEGAND_FORMAT_34
+    };
+
     private Context mContext;
     private IMcuService mMcuService;
     private IGpioService mGpioService;
+    private IWiegandService mWiegandService;
     private IRomUpgradeService mRomUpgradeService;
     private ILog2fileService mLog2fileService;
     private IModemService mModemService;
@@ -91,6 +98,15 @@ public class TBManager implements ITBManager {
             method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
             IBinder binder = (IBinder) method.invoke(null, new Object[]{"gpio"});
             mGpioService = IGpioService.Stub.asInterface(binder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 获取Wiegand Service
+        try {
+            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
+            IBinder binder = (IBinder) method.invoke(null, new Object[]{"wiegand"});
+            mWiegandService = IWiegandService.Stub.asInterface(binder);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -904,5 +920,78 @@ public class TBManager implements ITBManager {
         if (!InstallUtils.installSilent(path)) {
             InstallUtils.install(mContext, path);
         }
+    }
+
+    @Override
+    public boolean setWiegandReadFormat(WiegandFormat format) {
+        if (mWiegandService != null) {
+            try {
+                int ret = -1;
+                if (format == WiegandFormat.WIEGAND_FORMAT_26) {
+                    ret = mWiegandService.setReadFormat(26);
+                } else if (format == WiegandFormat.WIEGAND_FORMAT_34) {
+                    ret = mWiegandService.setReadFormat(34);
+                }
+                if (ret < 0) {
+                    Log.e(TAG, "setWiegandReadFormat, error: " + ret);
+                } else {
+                    return true;
+                }
+            } catch (RemoteException e) {
+                Log.e(TAG, "setWiegandReadFormat, " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setWiegandWriteFormat(WiegandFormat format) {
+        if (mWiegandService != null) {
+            try {
+                int ret = -1;
+                if (format == WiegandFormat.WIEGAND_FORMAT_26) {
+                    ret = mWiegandService.setWriteFormat(26);
+                } else if (format == WiegandFormat.WIEGAND_FORMAT_34) {
+                    ret = mWiegandService.setWriteFormat(34);
+                }
+                if (ret < 0) {
+                    Log.e(TAG, "setWiegandWriteFormat, error: " + ret);
+                } else {
+                    return true;
+                }
+            } catch (RemoteException e) {
+                Log.e(TAG, "setWiegandWriteFormat, " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public int wiegandRead() {
+        if (mWiegandService != null) {
+            try {
+                return mWiegandService.read();
+            } catch (RemoteException e) {
+                Log.e(TAG, "wiegandRead, " + e.getMessage());
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public boolean wiegandWrite(int data) {
+        if (mWiegandService != null) {
+            try {
+                int ret = mWiegandService.write(data);
+                if (ret < 0) {
+                    Log.e(TAG, "wiegandWrite, error: " + ret);
+                } else {
+                    return true;
+                }
+            } catch (RemoteException e) {
+                Log.e(TAG, "wiegandWrite, " + e.getMessage());
+            }
+        }
+        return false;
     }
 }

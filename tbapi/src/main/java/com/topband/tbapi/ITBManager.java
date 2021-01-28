@@ -515,4 +515,39 @@ interface ITBManager {
      * @param path APK文件路径
      */
     public void silentInstall(String path);
+
+    /**
+     * 设置韦根读格式
+     *
+     * @param format 韦根格式
+     *               TBManager.WiegandFormat.WIEGAND_FORMAT_26：韦根26格式
+     *               TBManager.WiegandFormat.WIEGAND_FORMAT_24：韦根34格式
+     * @return true：成功，false：失败
+     */
+    public boolean setWiegandReadFormat(TBManager.WiegandFormat format);
+
+    /**
+     * 设置韦根写格式
+     *
+     * @param format 韦根格式
+     *               TBManager.WiegandFormat.WIEGAND_FORMAT_26：韦根26格式
+     *               TBManager.WiegandFormat.WIEGAND_FORMAT_24：韦根34格式
+     * @return true：成功，false：失败
+     */
+    public boolean setWiegandWriteFormat(TBManager.WiegandFormat format);
+
+    /**
+     * 读韦根数据
+     *
+     * @return 韦根数据（<0：失败）
+     */
+    public int wiegandRead();
+
+    /**
+     * 写韦根数据
+     *
+     * @param data 韦根数据
+     * @return true：成功，false：失败
+     */
+    public boolean wiegandWrite(int data);
 }
