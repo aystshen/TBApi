@@ -30,6 +30,12 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements
         CompoundButton.OnCheckedChangeListener,
@@ -427,8 +433,23 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 break;
             case R.id.btn_wiegand_read:
-                mWiegandReadBtn.setText(String.format("韦根读(0x%08x)",
-                        mTBManager.wiegandRead()));
+                mWiegandReadBtn.setText(String.format("韦根读(等待数据...)"));
+                mWiegandReadBtn.setEnabled(false);
+                Observable.create(new ObservableOnSubscribe<Integer>() {
+                    @Override
+                    public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {
+                        // wiegandRead 为阻塞式接口，需要在子线程中调用，当有数据才返回。
+                        emitter.onNext(mTBManager.wiegandRead());
+                    }
+                }).subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<Integer>() {
+                    @Override
+                    public void accept(Integer data) throws Exception {
+                        mWiegandReadBtn.setText(String.format("韦根读(0x%08x)", data));
+                        mWiegandReadBtn.setEnabled(true);
+                    }
+                });
                 break;
             case R.id.btn_wiegand_write:
                 mTBManager.wiegandWrite(0x00776677); // 0x00776677 为固定的测试数据
