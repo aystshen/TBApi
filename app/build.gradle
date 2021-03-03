@@ -77,6 +77,13 @@ dependencies {
     implementation 'com.jakewharton:butterknife:8.1.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.1.0'
 
+    // rxjava
+    implementation "io.reactivex.rxjava2:rxjava:2.2.4"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+
+    // rxlifecycle 自动取消对rxjava Observable订阅，防止内存泄漏。
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.1.0'
+
     // TBApi
     implementation 'com.topband.tbapi:tbapi:1.0.1'
 }
