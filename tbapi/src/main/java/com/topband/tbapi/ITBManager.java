@@ -323,6 +323,21 @@ interface ITBManager {
     public boolean setEthIp(String ip, String netmask, String gateway, String dns1, String dns2, String mode);
 
     /**
+     * 开关以太网
+     *
+     * @param enable true：打开， false：关闭
+     * @return true：成功， false：失败
+     */
+    public boolean setEthEnabled(boolean enable);
+
+    /**
+     * 以太网是否打开
+     *
+     * @return true：打开， false：关闭
+     */
+    public boolean isEthEnabled();
+
+    /**
      * 判断当前网络类型是DHCP或静态IP
      *
      * @return true：DHCP，false：静态IP

@@ -171,7 +171,7 @@ public class EthernetHelper {
                          @NonNull String mode) {
 
         if (!TextUtils.equals(mode, "STATIC")
-            && !TextUtils.equals(mode, "DHCP")) {
+                && !TextUtils.equals(mode, "DHCP")) {
             Log.e(TAG, "setIp, mode not supported");
             return false;
         }
@@ -265,6 +265,45 @@ public class EthernetHelper {
         } catch (Exception e) {
             Log.e(TAG, "setIp, " + e.getMessage());
             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 开关以太网
+     *
+     * @param enable true：打开， false：关闭
+     * @return true：成功， false：失败
+     */
+    public boolean setEthEnabled(boolean enable) {
+        if (mEthManagerObj != null) {
+            try {
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("setEthernetEnabled", Boolean.TYPE);
+                method.setAccessible(true);
+                return (boolean) method.invoke(mEthManagerObj, new Boolean(enable));
+            } catch (Exception e) {
+                Log.e(TAG, "setEthEnabled, " + e.getMessage());
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 以太网是否打开
+     *
+     * @return true：打开， false：关闭
+     */
+    public boolean isEthEnabled() {
+        if (mEthManagerObj != null) {
+            try {
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("isEthernetEnabled");
+                method.setAccessible(true);
+                return (boolean) method.invoke(mEthManagerObj);
+            } catch (Exception e) {
+                Log.e(TAG, "isEthEnabled, " + e.getMessage());
+            }
         }
 
         return true;

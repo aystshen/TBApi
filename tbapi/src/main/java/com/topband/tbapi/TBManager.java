@@ -643,6 +643,16 @@ public class TBManager implements ITBManager {
     }
 
     @Override
+    public boolean setEthEnabled(boolean enable) {
+        return mEthernetHelper.setEthEnabled(enable);
+    }
+
+    @Override
+    public boolean isEthEnabled() {
+        return mEthernetHelper.isEthEnabled();
+    }
+
+    @Override
     public boolean isDhcp() {
         return TextUtils.equals("DHCP", mEthernetHelper.getIpAssignment());
     }

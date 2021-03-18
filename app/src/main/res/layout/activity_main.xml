@@ -600,6 +600,13 @@
                         android:layout_height="wrap_content"
                         android:textOff="STATIC"
                         android:textOn="DHCP" />
+
+                    <ToggleButton
+                        android:id="@+id/btn_eth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textOff="以太网（关）"
+                        android:textOn="以太网（开）" />
                 </LinearLayout>
 
             </LinearLayout>

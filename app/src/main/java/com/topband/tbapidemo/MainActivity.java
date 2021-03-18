@@ -166,6 +166,8 @@ public class MainActivity extends AppCompatActivity implements
     Button mWiegandReadBtn;
     @BindView(R.id.btn_wiegand_write)
     Button mWiegandWriteBtn;
+    @BindView(R.id.btn_eth)
+    ToggleButton mEthBtn;
 
     private TBManager mTBManager;
     private Handler mHandler;
@@ -246,6 +248,8 @@ public class MainActivity extends AppCompatActivity implements
         mEthGatewayEdt.setText(mTBManager.getEthGateway());
         mEthDnsEdt1.setText(mTBManager.getEthDns1());
         mEthDnsEdt2.setText(mTBManager.getEthDns2());
+        mEthBtn.setChecked(mTBManager.isEthEnabled());
+        mEthBtn.setOnCheckedChangeListener(this);
 
         // 存储
         mSdcardPathTv.setText(mTBManager.getSdcardPath());
@@ -444,12 +448,12 @@ public class MainActivity extends AppCompatActivity implements
                 }).subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(new Consumer<Integer>() {
-                    @Override
-                    public void accept(Integer data) throws Exception {
-                        mWiegandReadBtn.setText(String.format("韦根读(0x%08x)", data));
-                        mWiegandReadBtn.setEnabled(true);
-                    }
-                });
+                            @Override
+                            public void accept(Integer data) throws Exception {
+                                mWiegandReadBtn.setText(String.format("韦根读(0x%08x)", data));
+                                mWiegandReadBtn.setEnabled(true);
+                            }
+                        });
                 break;
             case R.id.btn_wiegand_write:
                 mTBManager.wiegandWrite(0x00776677); // 0x00776677 为固定的测试数据
@@ -507,6 +511,9 @@ public class MainActivity extends AppCompatActivity implements
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
+                break;
+            case R.id.btn_eth:
+                mTBManager.setEthEnabled(b);
                 break;
             case R.id.btn_gpio_direction:
                 if (b) {

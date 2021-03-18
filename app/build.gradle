@@ -62,7 +62,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-//    implementation project(':tbapi')
+    implementation project(':tbapi')
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
@@ -85,7 +85,7 @@ dependencies {
     implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.1.0'
 
     // TBApi
-    implementation 'com.topband.tbapi:tbapi:1.0.1'
+//    implementation 'com.topband.tbapi:tbapi:1.0.1'
 }
 
 def releaseTime() {
