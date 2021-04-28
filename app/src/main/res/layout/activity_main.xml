@@ -831,6 +831,13 @@
                     android:layout_height="wrap_content"
                     android:text="静默安装" />
 
+                <ToggleButton
+                    android:id="@+id/btn_mute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="设置静音"
+                    android:textOn="取消静音" />
+
             </com.google.android.flexbox.FlexboxLayout>
 
             <TextView

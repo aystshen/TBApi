@@ -565,4 +565,14 @@ interface ITBManager {
      * @return true：成功，false：失败
      */
     public boolean wiegandWrite(int data);
+
+    /**
+     * 静音
+     */
+    public void mute();
+
+    /**
+     * 取消静音
+     */
+    public void unmute();
 }

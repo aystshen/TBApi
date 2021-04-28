@@ -168,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements
     Button mWiegandWriteBtn;
     @BindView(R.id.btn_eth)
     ToggleButton mEthBtn;
+    @BindView(R.id.btn_mute)
+    ToggleButton mMuteBtn;
 
     private TBManager mTBManager;
     private Handler mHandler;
@@ -299,6 +301,7 @@ public class MainActivity extends AppCompatActivity implements
         m4gKeepliveBtn.setOnCheckedChangeListener(this);
         mKeyInterceptBtn.setChecked(mTBManager.keyInterceptIsOpen());
         mKeyInterceptBtn.setOnCheckedChangeListener(this);
+        mMuteBtn.setOnCheckedChangeListener(this);
 
         // 韦根
         mTBManager.setWiegandReadFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_26);
@@ -565,6 +568,13 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.rdo_wiegand_write_34:
                 if (b) {
                     mTBManager.setWiegandWriteFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_34);
+                }
+                break;
+            case R.id.btn_mute:
+                if (b) {
+                    mTBManager.mute();
+                } else {
+                    mTBManager.unmute();
                 }
                 break;
         }

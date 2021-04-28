@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Point;
+import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
@@ -46,7 +47,7 @@ public class TBManager implements ITBManager {
     private static final String TAG = "TBManager";
 
     // API版本
-    private static final String VERSION = "1.0.1";
+    private static final String VERSION = "1.0.2";
 
     // 屏幕旋转角度
     public static final int SCREEN_ANGLE_0 = 0;
@@ -69,6 +70,8 @@ public class TBManager implements ITBManager {
     private IKeyInterceptService mKeyInterceptService;
     private ITimeRTCService mTimingSwitchService;
     private EthernetHelper mEthernetHelper;
+
+    private static AudioManager sAudioManager;
 
     public TBManager(Context context) {
         mContext = context;
@@ -1003,5 +1006,31 @@ public class TBManager implements ITBManager {
             }
         }
         return false;
+    }
+
+    @Override
+    public void mute() {
+        if (sAudioManager == null) {
+            sAudioManager = (AudioManager) mContext.getSystemService(
+                    Context.AUDIO_SERVICE);
+        }
+        sAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+        sAudioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        sAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        sAudioManager.setStreamMute(AudioManager.STREAM_RING, true);
+        sAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+    }
+
+    @Override
+    public void unmute() {
+        if (sAudioManager == null) {
+            sAudioManager = (AudioManager) mContext.getSystemService(
+                    Context.AUDIO_SERVICE);
+        }
+        sAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+        sAudioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
+        sAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        sAudioManager.setStreamMute(AudioManager.STREAM_RING, false);
+        sAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
     }
 }
