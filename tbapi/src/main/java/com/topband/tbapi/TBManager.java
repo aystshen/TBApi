@@ -506,7 +506,13 @@ public class TBManager implements ITBManager {
 
     @Override
     public void setBackLight(boolean enable) {
-        //TODO
+        Log.i(TAG, "setBackLight, " + enable);
+        ShellUtils.CommandResult result = ShellUtils.execCmd(
+                "echo " + (enable ? "0" : "1") + " > /sys/class/backlight/backlight/bl_power",
+                    true);
+        if (result.result < 0) {
+            Log.e(TAG, "setBackLight, error: " + result.errorMsg);
+        }
     }
 
     @Override

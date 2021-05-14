@@ -224,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements
         mStatusbarBtn.setOnCheckedChangeListener(this);
         mNavbarBtn.setChecked(mTBManager.isNavBarShow());
         mNavbarBtn.setOnCheckedChangeListener(this);
+        mBacklightBtn.setOnCheckedChangeListener(this);
         mScreenWidthTv.setText(mTBManager.getScreenWidth(this) + "");
         mScreenHeightTv.setText(mTBManager.getScreenHeight(this) + "");
         mMainBacklightSeekbar.setOnSeekBarChangeListener(this);
