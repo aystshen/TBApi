@@ -30,6 +30,8 @@ import com.ayst.androidx.ITimeRTCService;
 import com.ayst.romupgrade.IRomUpgradeService;
 import com.topband.tbapi.utils.DeviceInfoUtils;
 import com.topband.tbapi.utils.EthernetHelper;
+import com.topband.tbapi.utils.EthernetHelperR;
+import com.topband.tbapi.utils.IEthernetHelper;
 import com.topband.tbapi.utils.InstallUtils;
 import com.topband.tbapi.utils.ShellUtils;
 import com.topband.tbapi.utils.SystemUtils;
@@ -69,7 +71,7 @@ public class TBManager implements ITBManager {
     private IModemService mModemService;
     private IKeyInterceptService mKeyInterceptService;
     private ITimeRTCService mTimingSwitchService;
-    private EthernetHelper mEthernetHelper;
+    private IEthernetHelper mEthernetHelper;
 
     private static AudioManager sAudioManager;
 
@@ -84,7 +86,11 @@ public class TBManager implements ITBManager {
     public void init() {
         Log.i(TAG, "init, API Version: " + VERSION);
 
-        mEthernetHelper = new EthernetHelper(mContext);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            mEthernetHelper = new EthernetHelperR(mContext);
+        } else {
+            mEthernetHelper = new EthernetHelper(mContext);
+        }
 
         // 获取MCU Service
         Method method = null;

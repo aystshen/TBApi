@@ -16,13 +16,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-public class EthernetHelper implements IEthernetHelper {
-    private static final String TAG = "EthernetHelper";
+public class EthernetHelperR implements IEthernetHelper {
+    private static final String TAG = "EthernetHelperR";
 
     private Object mEthManagerObj;
 
     @SuppressLint("PrivateApi")
-    public EthernetHelper(Context context) {
+    public EthernetHelperR(Context context) {
         try {
             String service = (String) Context.class.getField("ETHERNET_SERVICE").get(null);
             mEthManagerObj = context.getSystemService(service);
@@ -39,9 +39,9 @@ public class EthernetHelper implements IEthernetHelper {
     public String getIp() {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getIpAddress");
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("getIpAddress", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj);
+                return (String) method.invoke(mEthManagerObj, "eth0");
             } catch (Exception e) {
                 Log.e(TAG, "getIp, " + e.getMessage());
             }
@@ -58,9 +58,9 @@ public class EthernetHelper implements IEthernetHelper {
     public String getNetmask() {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getNetmask");
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("getNetmask", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj);
+                return (String) method.invoke(mEthManagerObj, "eth0");
             } catch (Exception e) {
                 Log.e(TAG, "getNetmask, " + e.getMessage());
             }
@@ -77,9 +77,9 @@ public class EthernetHelper implements IEthernetHelper {
     public String getGateway() {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getGateway");
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("getGateway", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj);
+                return (String) method.invoke(mEthManagerObj,"eth0");
             } catch (Exception e) {
                 Log.e(TAG, "getGateway, " + e.getMessage());
             }
@@ -96,9 +96,9 @@ public class EthernetHelper implements IEthernetHelper {
     public String getDns1() {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns");
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns", String.class);
                 method.setAccessible(true);
-                String dns = (String) method.invoke(mEthManagerObj);
+                String dns = (String) method.invoke(mEthManagerObj, "eth0");
                 String data[] = dns.split(",");
                 return data[0];
             } catch (Exception e) {
@@ -117,9 +117,9 @@ public class EthernetHelper implements IEthernetHelper {
     public String getDns2() {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns");
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns", String.class);
                 method.setAccessible(true);
-                String dns = (String) method.invoke(mEthManagerObj);
+                String dns = (String) method.invoke(mEthManagerObj, "eth0");
                 String data[] = dns.split(",");
                 return data[1];
             } catch (Exception e) {
@@ -138,9 +138,9 @@ public class EthernetHelper implements IEthernetHelper {
     public String getIpAssignment() {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getConfiguration");
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("getConfiguration", String.class);
                 method.setAccessible(true);
-                Object configuration = method.invoke(mEthManagerObj);
+                Object configuration = method.invoke(mEthManagerObj, "eth0");
                 Field ipAssignment = configuration.getClass().getDeclaredField("ipAssignment");
                 ipAssignment.setAccessible(true);
                 return ipAssignment.get(configuration).toString();
@@ -256,9 +256,9 @@ public class EthernetHelper implements IEthernetHelper {
                             proxySettingsMap.get("NONE"), sicInstance, null);
 
                     // mEthManager.setConfiguration(mIpConfiguration);
-                    Method method = mEthManagerObj.getClass().getDeclaredMethod("setConfiguration", ipcClazz);
+                    Method method = mEthManagerObj.getClass().getDeclaredMethod("setConfiguration", String.class, ipcClazz);
                     method.setAccessible(true);
-                    method.invoke(mEthManagerObj, ipcInstance);
+                    method.invoke(mEthManagerObj, "eth0", ipcInstance);
                     break;
                 }
             }
@@ -279,9 +279,9 @@ public class EthernetHelper implements IEthernetHelper {
     public boolean setEthEnabled(boolean enable) {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("setEthernetEnabled", Boolean.TYPE);
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("setEthernetEnabled", String.class, Boolean.TYPE);
                 method.setAccessible(true);
-                return (boolean) method.invoke(mEthManagerObj, new Boolean(enable));
+                return (boolean) method.invoke(mEthManagerObj, "eth0", new Boolean(enable));
             } catch (Exception e) {
                 Log.e(TAG, "setEthEnabled, " + e.getMessage());
             }
@@ -298,9 +298,9 @@ public class EthernetHelper implements IEthernetHelper {
     public boolean isEthEnabled() {
         if (mEthManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("isEthernetEnabled");
+                Method method = mEthManagerObj.getClass().getDeclaredMethod("isEthernetEnabled", String.class);
                 method.setAccessible(true);
-                return (boolean) method.invoke(mEthManagerObj);
+                return (boolean) method.invoke(mEthManagerObj, "eth0");
             } catch (Exception e) {
                 Log.e(TAG, "isEthEnabled, " + e.getMessage());
             }
