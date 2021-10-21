@@ -527,7 +527,7 @@ interface ITBManager {
     /**
      * 设置OTG口模式
      *
-     * @param mode  0: auto, 1: host, 2: device
+     * @param mode 0: auto, 1: host, 2: device
      * @param save true：保存，false：不保存，单次有效
      * @return true：成功，false：失败
      */
@@ -536,7 +536,7 @@ interface ITBManager {
     /**
      * 获取OTG口模式
      *
-     * @return  0: auto, 1: host, 2: device
+     * @return 0: auto, 1: host, 2: device
      */
     public String getOtgMode();
 
@@ -600,4 +600,21 @@ interface ITBManager {
      * 取消静音
      */
     public void unmute();
+
+    /**
+     * 打开ADB
+     */
+    public void openAdb();
+
+    /**
+     * 关闭ADB
+     */
+    public void closeAdb();
+
+    /**
+     * ADB是否打开
+     *
+     * @return true：打开，false：关闭
+     */
+    public boolean isAdbOpen();
 }

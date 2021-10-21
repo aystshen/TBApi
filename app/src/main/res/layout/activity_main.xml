@@ -838,6 +838,13 @@
                     android:textOff="设置静音"
                     android:textOn="取消静音" />
 
+                <ToggleButton
+                    android:id="@+id/btn_adb"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="ADB"
+                    android:textOn="ADB" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"

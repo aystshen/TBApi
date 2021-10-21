@@ -1115,4 +1115,27 @@ public class TBManager implements ITBManager {
         sAudioManager.setStreamMute(AudioManager.STREAM_RING, false);
         sAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
     }
+
+    @Override
+    public void openAdb() {
+        Settings.Global.putInt(mContext.getContentResolver(),
+                Settings.Global.ADB_ENABLED, 1);
+    }
+
+    @Override
+    public void closeAdb() {
+        Settings.Global.putInt(mContext.getContentResolver(),
+                Settings.Global.ADB_ENABLED, 0);
+    }
+
+    @Override
+    public boolean isAdbOpen() {
+        try {
+            return Settings.Global.getInt(mContext.getContentResolver(),
+                    Settings.Global.ADB_ENABLED) > 0;
+        } catch (Settings.SettingNotFoundException e) {
+            Log.e(TAG, "isAdbEnabled, " + e.getMessage());
+        }
+        return false;
+    }
 }

@@ -170,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements
     ToggleButton mEthBtn;
     @BindView(R.id.btn_mute)
     ToggleButton mMuteBtn;
+    @BindView(R.id.btn_adb)
+    ToggleButton mAdbBtn;
     @BindView(R.id.spn_otg)
     Spinner mOtgSpn;
 
@@ -305,6 +307,8 @@ public class MainActivity extends AppCompatActivity implements
         mKeyInterceptBtn.setChecked(mTBManager.keyInterceptIsOpen());
         mKeyInterceptBtn.setOnCheckedChangeListener(this);
         mMuteBtn.setOnCheckedChangeListener(this);
+        mAdbBtn.setChecked(mTBManager.isAdbOpen());
+        mAdbBtn.setOnCheckedChangeListener(this);
 
         // 韦根
         mTBManager.setWiegandReadFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_26);
@@ -596,6 +600,13 @@ public class MainActivity extends AppCompatActivity implements
                     mTBManager.mute();
                 } else {
                     mTBManager.unmute();
+                }
+                break;
+            case R.id.btn_adb:
+                if (b) {
+                    mTBManager.openAdb();
+                } else {
+                    mTBManager.closeAdb();
                 }
                 break;
         }
