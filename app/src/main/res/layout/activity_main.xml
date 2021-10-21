@@ -838,6 +838,17 @@
                     android:textOff="设置静音"
                     android:textOn="取消静音" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:text="OTG模式："/>
+
+                <Spinner
+                    android:id="@+id/spn_otg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
             </com.google.android.flexbox.FlexboxLayout>
 
             <TextView

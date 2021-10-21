@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.topband.tbapi.utils.ShellUtils;
 
 interface ITBManager {
+
     /**
      * 获取API版本号
      *
@@ -452,18 +453,18 @@ interface ITBManager {
     public boolean isLog2fileOpen();
 
     /**
-     * 设置最大日志文件数量
-     *
-     * @param num 最大日志文件数量
-     */
-    public void setLogFileNum(int num);
-
-    /**
      * 获取最大日志文件数量
      *
      * @return 最大日志文件数量
      */
     public int getLogFileNum();
+
+    /**
+     * 设置最大日志文件数量
+     *
+     * @param num 最大日志文件数量
+     */
+    public void setLogFileNum(int num);
 
     /**
      * 获取日志文件存储路径
@@ -514,6 +515,30 @@ interface ITBManager {
      * @return true：打开，false：关闭
      */
     public boolean keyInterceptIsOpen();
+
+    /**
+     * 设置OTG口模式（默认保存）
+     *
+     * @param mode 0: auto, 1: host, 2: device
+     * @return true：成功，false：失败
+     */
+    public boolean setOtgMode(String mode);
+
+    /**
+     * 设置OTG口模式
+     *
+     * @param mode  0: auto, 1: host, 2: device
+     * @param save true：保存，false：不保存，单次有效
+     * @return true：成功，false：失败
+     */
+    public boolean setOtgModeExt(String mode, boolean save);
+
+    /**
+     * 获取OTG口模式
+     *
+     * @return  0: auto, 1: host, 2: device
+     */
+    public String getOtgMode();
 
     /**
      * 其它扩展设备控制

@@ -26,6 +26,7 @@ import androidx.annotation.NonNull;
 import com.ayst.androidx.IKeyInterceptService;
 import com.ayst.androidx.ILog2fileService;
 import com.ayst.androidx.IModemService;
+import com.ayst.androidx.IOtgService;
 import com.ayst.androidx.ITimeRTCService;
 import com.ayst.romupgrade.IRomUpgradeService;
 import com.topband.tbapi.utils.DeviceInfoUtils;
@@ -71,6 +72,7 @@ public class TBManager implements ITBManager {
     private IModemService mModemService;
     private IKeyInterceptService mKeyInterceptService;
     private ITimeRTCService mTimingSwitchService;
+    private IOtgService mOtgService;
     private IEthernetHelper mEthernetHelper;
 
     private static AudioManager sAudioManager;
@@ -144,10 +146,17 @@ public class TBManager implements ITBManager {
         intent.setAction("com.ayst.androidx.KEY_INTERCEPT_SERVICE");
         mContext.bindService(intent, mKeyInterceptServiceConnection, Context.BIND_AUTO_CREATE);
 
+        // 绑定定时开关机Service
         intent = new Intent();
         intent.setPackage("com.ayst.androidx");
         intent.setAction("com.ayst.androidx.TIMERTC_SREVICE");
         mContext.bindService(intent, mTimingSwitchServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // 绑定Otg Service
+        intent = new Intent();
+        intent.setPackage("com.ayst.androidx");
+        intent.setAction("com.ayst.androidx.OTG_SERVICE");
+        mContext.bindService(intent, mOtgServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
     /**
@@ -245,6 +254,23 @@ public class TBManager implements ITBManager {
         public void onServiceDisconnected(ComponentName name) {
             Log.d(TAG, "ITimeRTCService, onServiceDisconnected...");
             mTimingSwitchService = null;
+        }
+    };
+
+    /**
+     * Otg Service Connection
+     */
+    private ServiceConnection mOtgServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "IOtgService, onServiceConnected...");
+            mOtgService = IOtgService.Stub.asInterface(service);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(TAG, "IOtgService, onServiceDisconnected...");
+            mOtgService = null;
         }
     };
 
@@ -941,6 +967,42 @@ public class TBManager implements ITBManager {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean setOtgMode(String mode) {
+        if (mOtgService != null) {
+            try {
+                return mOtgService.setOtgMode(mode);
+            } catch (RemoteException e) {
+                Log.e(TAG, "setOtgMode, " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean setOtgModeExt(String mode, boolean save) {
+        if (mOtgService != null) {
+            try {
+                return mOtgService.setOtgModeExt(mode, save);
+            } catch (RemoteException e) {
+                Log.e(TAG, "setOtgModeExt, " + e.getMessage());
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String getOtgMode() {
+        if (mOtgService != null) {
+            try {
+                return mOtgService.getOtgMode();
+            } catch (RemoteException e) {
+                Log.e(TAG, "getOtgMode, " + e.getMessage());
+            }
+        }
+        return "0";
     }
 
     @Override

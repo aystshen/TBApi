@@ -170,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements
     ToggleButton mEthBtn;
     @BindView(R.id.btn_mute)
     ToggleButton mMuteBtn;
+    @BindView(R.id.spn_otg)
+    Spinner mOtgSpn;
 
     private TBManager mTBManager;
     private Handler mHandler;
@@ -314,6 +316,24 @@ public class MainActivity extends AppCompatActivity implements
         mWiegandRead34Rdo.setOnCheckedChangeListener(this);
         mWiegandWrite26Rdo.setOnCheckedChangeListener(this);
         mWiegandWrite34Rdo.setOnCheckedChangeListener(this);
+
+        // OTG
+        String[] otgItems = {"auto", "host", "device"};
+        ArrayAdapter<String> otgSpinnerAdapter = new ArrayAdapter<>(this,
+                R.layout.spinner_item, otgItems);
+        mOtgSpn.setAdapter(otgSpinnerAdapter);
+        mOtgSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                mTBManager.setOtgMode(String.valueOf(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        mOtgSpn.setSelection(Integer.valueOf(mTBManager.getOtgMode()));
     }
 
     @SuppressLint("DefaultLocale")
