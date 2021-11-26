@@ -2,6 +2,7 @@ package com.topband.tbapi;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.os.IBinder;
 import android.os.IGpioService;
 import android.os.IMcuService;
 import android.os.IWiegandService;
+import android.os.PowerManager;
 import android.os.RemoteException;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -50,18 +52,13 @@ public class TBManager implements ITBManager {
     private static final String TAG = "TBManager";
 
     // API版本
-    private static final String VERSION = "1.0.2";
+    private static final String VERSION = "1.0.10";
 
     // 屏幕旋转角度
     public static final int SCREEN_ANGLE_0 = 0;
     public static final int SCREEN_ANGLE_90 = 90;
     public static final int SCREEN_ANGLE_180 = 180;
     public static final int SCREEN_ANGLE_270 = 270;
-
-    public enum WiegandFormat {
-        WIEGAND_FORMAT_26,
-        WIEGAND_FORMAT_34
-    };
 
     private Context mContext;
     private IMcuService mMcuService;
@@ -74,103 +71,9 @@ public class TBManager implements ITBManager {
     private ITimeRTCService mTimingSwitchService;
     private IOtgService mOtgService;
     private IEthernetHelper mEthernetHelper;
-
-    private static AudioManager sAudioManager;
-
-    public TBManager(Context context) {
-        mContext = context;
-    }
-
-    /**
-     * 初始化
-     */
-    @SuppressLint("PrivateApi")
-    public void init() {
-        Log.i(TAG, "init, API Version: " + VERSION);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            mEthernetHelper = new EthernetHelperR(mContext);
-        } else {
-            mEthernetHelper = new EthernetHelper(mContext);
-        }
-
-        // 获取MCU Service
-        Method method = null;
-        try {
-            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
-            IBinder binder = (IBinder) method.invoke(null, new Object[]{"mcu"});
-            mMcuService = IMcuService.Stub.asInterface(binder);
-        } catch (Exception e) {
-            Log.e(TAG, "TBManager, get mcu service fail");
-        }
-
-        // 获取GPIO Service
-        try {
-            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
-            IBinder binder = (IBinder) method.invoke(null, new Object[]{"gpio"});
-            mGpioService = IGpioService.Stub.asInterface(binder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 获取Wiegand Service
-        try {
-            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
-            IBinder binder = (IBinder) method.invoke(null, new Object[]{"wiegand"});
-            mWiegandService = IWiegandService.Stub.asInterface(binder);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // 绑定升级Service
-        Intent intent = new Intent();
-        intent.setPackage("com.ayst.romupgrade");
-        intent.setAction("com.ayst.romupgrade.UPGRADE_SERVICE");
-        mContext.bindService(intent, mRomUpgradeServiceConnection, Context.BIND_AUTO_CREATE);
-
-        // 绑定Log2file Service
-        intent = new Intent();
-        intent.setPackage("com.ayst.androidx");
-        intent.setAction("com.ayst.androidx.LOG2FILE_SERVICE");
-        mContext.bindService(intent, mLog2fileServiceConnection, Context.BIND_AUTO_CREATE);
-
-        // 绑定4G保活Service
-        intent = new Intent();
-        intent.setPackage("com.ayst.androidx");
-        intent.setAction("com.ayst.androidx.MODEM_SERVICE");
-        mContext.bindService(intent, mModemServiceConnection, Context.BIND_AUTO_CREATE);
-
-        // 绑定事件拦截Service
-        intent = new Intent();
-        intent.setPackage("com.ayst.androidx");
-        intent.setAction("com.ayst.androidx.KEY_INTERCEPT_SERVICE");
-        mContext.bindService(intent, mKeyInterceptServiceConnection, Context.BIND_AUTO_CREATE);
-
-        // 绑定定时开关机Service
-        intent = new Intent();
-        intent.setPackage("com.ayst.androidx");
-        intent.setAction("com.ayst.androidx.TIMERTC_SREVICE");
-        mContext.bindService(intent, mTimingSwitchServiceConnection, Context.BIND_AUTO_CREATE);
-
-        // 绑定Otg Service
-        intent = new Intent();
-        intent.setPackage("com.ayst.androidx");
-        intent.setAction("com.ayst.androidx.OTG_SERVICE");
-        mContext.bindService(intent, mOtgServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    /**
-     * 清理
-     */
-    public void deinit() {
-        Log.i(TAG, "deinit");
-
-        mContext.unbindService(mRomUpgradeServiceConnection);
-        mContext.unbindService(mLog2fileServiceConnection);
-        mContext.unbindService(mModemServiceConnection);
-        mContext.unbindService(mKeyInterceptServiceConnection);
-        mContext.unbindService(mTimingSwitchServiceConnection);
-    }
+    private PowerManager mPowerManager;
+    private DevicePolicyManager mDevicePolicyManager;
+    private AudioManager mAudioManager;
 
     /**
      * 升级Service Connection
@@ -273,6 +176,117 @@ public class TBManager implements ITBManager {
             mOtgService = null;
         }
     };
+
+    public TBManager(Context context) {
+        mContext = context;
+    }
+
+    @SuppressLint("PrivateApi")
+    private static void activeAdmin(Context context) {
+        ComponentName adminReceiver = new ComponentName(context, AdminReceiver.class);
+        try {
+            DevicePolicyManager dpm = (DevicePolicyManager) context.getSystemService(Context.DEVICE_POLICY_SERVICE);
+            Method setActiveAdmin = dpm.getClass().getDeclaredMethod("setActiveAdmin", ComponentName.class, boolean.class);
+            setActiveAdmin.setAccessible(true);
+            setActiveAdmin.invoke(dpm, adminReceiver, true);
+        } catch (Exception e) {
+            Log.e(TAG, "activeAdmin, " + e.getMessage());
+        }
+    }
+
+    /**
+     * 初始化
+     */
+    @SuppressLint("PrivateApi")
+    public void init() {
+        Log.i(TAG, "init, API Version: " + VERSION);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            mEthernetHelper = new EthernetHelperR(mContext);
+        } else {
+            mEthernetHelper = new EthernetHelper(mContext);
+        }
+
+        // 获取MCU Service
+        Method method = null;
+        try {
+            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
+            IBinder binder = (IBinder) method.invoke(null, new Object[]{"mcu"});
+            mMcuService = IMcuService.Stub.asInterface(binder);
+        } catch (Exception e) {
+            Log.e(TAG, "TBManager, get mcu service fail");
+        }
+
+        // 获取GPIO Service
+        try {
+            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
+            IBinder binder = (IBinder) method.invoke(null, new Object[]{"gpio"});
+            mGpioService = IGpioService.Stub.asInterface(binder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 获取Wiegand Service
+        try {
+            method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
+            IBinder binder = (IBinder) method.invoke(null, new Object[]{"wiegand"});
+            mWiegandService = IWiegandService.Stub.asInterface(binder);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 绑定升级Service
+        Intent intent = new Intent();
+        intent.setPackage("com.ayst.romupgrade");
+        intent.setAction("com.ayst.romupgrade.UPGRADE_SERVICE");
+        mContext.bindService(intent, mRomUpgradeServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // 绑定Log2file Service
+        intent = new Intent();
+        intent.setPackage("com.ayst.androidx");
+        intent.setAction("com.ayst.androidx.LOG2FILE_SERVICE");
+        mContext.bindService(intent, mLog2fileServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // 绑定4G保活Service
+        intent = new Intent();
+        intent.setPackage("com.ayst.androidx");
+        intent.setAction("com.ayst.androidx.MODEM_SERVICE");
+        mContext.bindService(intent, mModemServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // 绑定事件拦截Service
+        intent = new Intent();
+        intent.setPackage("com.ayst.androidx");
+        intent.setAction("com.ayst.androidx.KEY_INTERCEPT_SERVICE");
+        mContext.bindService(intent, mKeyInterceptServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // 绑定定时开关机Service
+        intent = new Intent();
+        intent.setPackage("com.ayst.androidx");
+        intent.setAction("com.ayst.androidx.TIMERTC_SREVICE");
+        mContext.bindService(intent, mTimingSwitchServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // 绑定Otg Service
+        intent = new Intent();
+        intent.setPackage("com.ayst.androidx");
+        intent.setAction("com.ayst.androidx.OTG_SERVICE");
+        mContext.bindService(intent, mOtgServiceConnection, Context.BIND_AUTO_CREATE);
+
+        // 激活设备管理权限
+        activeAdmin(mContext);
+    }
+
+    /**
+     * 清理
+     */
+    public void deinit() {
+        Log.i(TAG, "deinit");
+
+        mContext.unbindService(mRomUpgradeServiceConnection);
+        mContext.unbindService(mLog2fileServiceConnection);
+        mContext.unbindService(mModemServiceConnection);
+        mContext.unbindService(mKeyInterceptServiceConnection);
+        mContext.unbindService(mTimingSwitchServiceConnection);
+    }
 
     @Override
     public String getAPIVersion() {
@@ -541,11 +555,11 @@ public class TBManager implements ITBManager {
         Log.i(TAG, "setBackLight, " + enable);
 
         String[] nodes = {"/sys/class/backlight/backlight/bl_power",
-                        "/sys/class/backlight/rk28_bl/bl_power"};
+                "/sys/class/backlight/rk28_bl/bl_power"};
         for (String node : nodes) {
             ShellUtils.CommandResult result = ShellUtils.execCmd(
                     "echo " + (enable ? "0" : "1") + " > " + node,
-                    true);
+                    false);
             if (!TextUtils.isEmpty(result.errorMsg)) {
                 Log.e(TAG, "setBackLight, " + node + ", error: " + result.errorMsg);
             } else {
@@ -575,6 +589,32 @@ public class TBManager implements ITBManager {
                     "screen_brightness_ext", brightness);
         } catch (Exception e) {
             Log.e(TAG, "setBrightness, " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void screenOn() {
+        if (null == mPowerManager) {
+            mPowerManager = ((PowerManager) mContext.getSystemService(Context.POWER_SERVICE));
+        }
+        PowerManager.WakeLock wakeLock = mPowerManager.newWakeLock(
+                PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,
+                "tbapi:screenOn");
+        wakeLock.acquire();
+        wakeLock.release();
+    }
+
+    @Override
+    public void screenOff() {
+        if (null == mDevicePolicyManager) {
+            mDevicePolicyManager = (DevicePolicyManager) mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
+        }
+        ComponentName adminReceiver = new ComponentName(mContext, AdminReceiver.class);
+        boolean admin = mDevicePolicyManager.isAdminActive(adminReceiver);
+        if (admin) {
+            mDevicePolicyManager.lockNow();
+        } else {
+            Log.e(TAG, "screenOff, No device admin permissions");
         }
     }
 
@@ -868,17 +908,6 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public void setLogFileNum(int num) {
-        if (mLog2fileService != null) {
-            try {
-                mLog2fileService.setLogFileNum(num);
-            } catch (RemoteException e) {
-                Log.e(TAG, "setLogFileNum, " + e.getMessage());
-            }
-        }
-    }
-
-    @Override
     public int getLogFileNum() {
         if (mLog2fileService != null) {
             try {
@@ -888,6 +917,17 @@ public class TBManager implements ITBManager {
             }
         }
         return 0;
+    }
+
+    @Override
+    public void setLogFileNum(int num) {
+        if (mLog2fileService != null) {
+            try {
+                mLog2fileService.setLogFileNum(num);
+            } catch (RemoteException e) {
+                Log.e(TAG, "setLogFileNum, " + e.getMessage());
+            }
+        }
     }
 
     @Override
@@ -1092,28 +1132,28 @@ public class TBManager implements ITBManager {
 
     @Override
     public void mute() {
-        if (sAudioManager == null) {
-            sAudioManager = (AudioManager) mContext.getSystemService(
+        if (mAudioManager == null) {
+            mAudioManager = (AudioManager) mContext.getSystemService(
                     Context.AUDIO_SERVICE);
         }
-        sAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
-        sAudioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
-        sAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
-        sAudioManager.setStreamMute(AudioManager.STREAM_RING, true);
-        sAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_RING, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
     }
 
     @Override
     public void unmute() {
-        if (sAudioManager == null) {
-            sAudioManager = (AudioManager) mContext.getSystemService(
+        if (mAudioManager == null) {
+            mAudioManager = (AudioManager) mContext.getSystemService(
                     Context.AUDIO_SERVICE);
         }
-        sAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
-        sAudioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
-        sAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-        sAudioManager.setStreamMute(AudioManager.STREAM_RING, false);
-        sAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_RING, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
     }
 
     @Override
@@ -1137,5 +1177,10 @@ public class TBManager implements ITBManager {
             Log.e(TAG, "isAdbEnabled, " + e.getMessage());
         }
         return false;
+    }
+
+    public enum WiegandFormat {
+        WIEGAND_FORMAT_26,
+        WIEGAND_FORMAT_34
     }
 }

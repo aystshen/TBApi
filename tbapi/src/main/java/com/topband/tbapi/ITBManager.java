@@ -233,6 +233,16 @@ interface ITBManager {
     public void setBrightnessExt(int brightness);
 
     /**
+     * 唤醒屏幕
+     */
+    public void screenOn();
+
+    /**
+     * 关闭屏幕
+     */
+    public void screenOff();
+
+    /**
      * 通知系统检查升级
      */
     public void checkUpdate();

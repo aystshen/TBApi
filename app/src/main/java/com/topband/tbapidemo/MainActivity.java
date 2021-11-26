@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -82,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements
     ToggleButton mNavbarBtn;
     @BindView(R.id.btn_backlight)
     ToggleButton mBacklightBtn;
+    @BindView(R.id.btn_screen_onoff)
+    ToggleButton mScreenOnOffBtn;
     @BindView(R.id.tv_screen_width)
     TextView mScreenWidthTv;
     @BindView(R.id.tv_screen_height)
@@ -229,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements
         mNavbarBtn.setChecked(mTBManager.isNavBarShow());
         mNavbarBtn.setOnCheckedChangeListener(this);
         mBacklightBtn.setOnCheckedChangeListener(this);
+        mScreenOnOffBtn.setOnCheckedChangeListener(this);
         mScreenWidthTv.setText(mTBManager.getScreenWidth(this) + "");
         mScreenHeightTv.setText(mTBManager.getScreenHeight(this) + "");
         mMainBacklightSeekbar.setOnSeekBarChangeListener(this);
@@ -518,6 +522,20 @@ public class MainActivity extends AppCompatActivity implements
                     mTBManager.setBackLight(true);
                 } else {
                     mTBManager.setBackLight(false);
+                }
+                break;
+            case R.id.btn_screen_onoff:
+                if (b) {
+                    mTBManager.screenOn();
+                } else {
+                    mTBManager.screenOff();
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTBManager.screenOn();
+                            Log.i(TAG, "screen on");
+                        }
+                    }, 10000);
                 }
                 break;
             case R.id.btn_dhcp:

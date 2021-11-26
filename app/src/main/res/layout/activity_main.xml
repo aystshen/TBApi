@@ -299,6 +299,13 @@
                     android:textOff="背光"
                     android:textOn="背光" />
 
+                <ToggleButton
+                    android:id="@+id/btn_screen_onoff"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="唤醒屏幕"
+                    android:textOn="关闭屏幕" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
