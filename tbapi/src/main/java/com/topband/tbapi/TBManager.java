@@ -52,7 +52,7 @@ public class TBManager implements ITBManager {
     private static final String TAG = "TBManager";
 
     // API版本
-    private static final String VERSION = "1.0.10";
+    private static final String VERSION = "1.0.11";
 
     // 屏幕旋转角度
     public static final int SCREEN_ANGLE_0 = 0;
@@ -286,6 +286,7 @@ public class TBManager implements ITBManager {
         mContext.unbindService(mModemServiceConnection);
         mContext.unbindService(mKeyInterceptServiceConnection);
         mContext.unbindService(mTimingSwitchServiceConnection);
+        mContext.unbindService(mOtgServiceConnection);
     }
 
     @Override
