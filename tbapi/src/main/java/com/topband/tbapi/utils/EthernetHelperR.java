@@ -34,14 +34,15 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 获取IP
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @return IP
      */
-    public String getIp() {
+    public String getIp(String iface) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("getIpAddress", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj, "eth0");
+                return (String) method.invoke(mEthManagerObj, iface);
             } catch (Exception e) {
                 Log.e(TAG, "getIp, " + e.getMessage());
             }
@@ -53,14 +54,15 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 获取子网掩码
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @return 子网掩码
      */
-    public String getNetmask() {
+    public String getNetmask(String iface) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("getNetmask", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj, "eth0");
+                return (String) method.invoke(mEthManagerObj, iface);
             } catch (Exception e) {
                 Log.e(TAG, "getNetmask, " + e.getMessage());
             }
@@ -72,14 +74,15 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 获取网关
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @return 网关
      */
-    public String getGateway() {
+    public String getGateway(String iface) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("getGateway", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj,"eth0");
+                return (String) method.invoke(mEthManagerObj, iface);
             } catch (Exception e) {
                 Log.e(TAG, "getGateway, " + e.getMessage());
             }
@@ -91,14 +94,15 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 获取DNS1
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @return DNS1
      */
-    public String getDns1() {
+    public String getDns1(String iface) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns", String.class);
                 method.setAccessible(true);
-                String dns = (String) method.invoke(mEthManagerObj, "eth0");
+                String dns = (String) method.invoke(mEthManagerObj, iface);
                 String data[] = dns.split(",");
                 return data[0];
             } catch (Exception e) {
@@ -112,14 +116,15 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 获取DNS2
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @return DNS2
      */
-    public String getDns2() {
+    public String getDns2(String iface) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns", String.class);
                 method.setAccessible(true);
-                String dns = (String) method.invoke(mEthManagerObj, "eth0");
+                String dns = (String) method.invoke(mEthManagerObj, iface);
                 String data[] = dns.split(",");
                 return data[1];
             } catch (Exception e) {
@@ -133,14 +138,15 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 获取IP分配方式
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @return DHCP：动态IP， STATIC：静态IP
      */
-    public String getIpAssignment() {
+    public String getIpAssignment(String iface) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("getConfiguration", String.class);
                 method.setAccessible(true);
-                Object configuration = method.invoke(mEthManagerObj, "eth0");
+                Object configuration = method.invoke(mEthManagerObj, iface);
                 Field ipAssignment = configuration.getClass().getDeclaredField("ipAssignment");
                 ipAssignment.setAccessible(true);
                 return ipAssignment.get(configuration).toString();
@@ -155,6 +161,7 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 设置IP
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @param ipStr      IP
      * @param netmaskStr 子网掩码
      * @param gatewayStr 网关
@@ -163,7 +170,8 @@ public class EthernetHelperR implements IEthernetHelper {
      * @param mode       连接模式，STATIC|DHCP
      * @return true：成功，false：失败
      */
-    public boolean setIp(String ipStr,
+    public boolean setIp(String iface,
+                         String ipStr,
                          String netmaskStr,
                          String gatewayStr,
                          String dnsStr1,
@@ -258,7 +266,7 @@ public class EthernetHelperR implements IEthernetHelper {
                     // mEthManager.setConfiguration(mIpConfiguration);
                     Method method = mEthManagerObj.getClass().getDeclaredMethod("setConfiguration", String.class, ipcClazz);
                     method.setAccessible(true);
-                    method.invoke(mEthManagerObj, "eth0", ipcInstance);
+                    method.invoke(mEthManagerObj, iface, ipcInstance);
                     break;
                 }
             }
@@ -273,15 +281,16 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 开关以太网
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @param enable true：打开， false：关闭
      * @return true：成功， false：失败
      */
-    public boolean setEthEnabled(boolean enable) {
+    public boolean setEnabled(String iface, boolean enable) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("setEthernetEnabled", String.class, Boolean.TYPE);
                 method.setAccessible(true);
-                return (boolean) method.invoke(mEthManagerObj, "eth0", new Boolean(enable));
+                return (boolean) method.invoke(mEthManagerObj, iface, new Boolean(enable));
             } catch (Exception e) {
                 Log.e(TAG, "setEthEnabled, " + e.getMessage());
             }
@@ -293,14 +302,15 @@ public class EthernetHelperR implements IEthernetHelper {
     /**
      * 以太网是否打开
      *
+     * @param iface 网卡名（eth0/eth1/...）
      * @return true：打开， false：关闭
      */
-    public boolean isEthEnabled() {
+    public boolean isEnabled(String iface) {
         if (mEthManagerObj != null) {
             try {
                 Method method = mEthManagerObj.getClass().getDeclaredMethod("isEthernetEnabled", String.class);
                 method.setAccessible(true);
-                return (boolean) method.invoke(mEthManagerObj, "eth0");
+                return (boolean) method.invoke(mEthManagerObj, iface);
             } catch (Exception e) {
                 Log.e(TAG, "isEthEnabled, " + e.getMessage());
             }

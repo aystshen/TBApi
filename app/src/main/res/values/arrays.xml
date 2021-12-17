@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="iface">
+        <item>eth0</item>
+        <item>usb0</item>
+    </string-array>
+</resources>

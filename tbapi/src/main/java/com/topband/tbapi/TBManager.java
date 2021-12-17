@@ -38,6 +38,7 @@ import com.topband.tbapi.utils.IEthernetHelper;
 import com.topband.tbapi.utils.InstallUtils;
 import com.topband.tbapi.utils.ShellUtils;
 import com.topband.tbapi.utils.SystemUtils;
+import com.topband.tbapi.utils.UsbnetHelperR;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,6 +48,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.security.InvalidParameterException;
 
 public class TBManager implements ITBManager {
     private static final String TAG = "TBManager";
@@ -60,6 +62,10 @@ public class TBManager implements ITBManager {
     public static final int SCREEN_ANGLE_180 = 180;
     public static final int SCREEN_ANGLE_270 = 270;
 
+    // 网卡前缀
+    public static final String IFACE_PREFIX_ETH = "eth";
+    public static final String IFACE_PREFIX_USB = "usb";
+
     private Context mContext;
     private IMcuService mMcuService;
     private IGpioService mGpioService;
@@ -71,6 +77,7 @@ public class TBManager implements ITBManager {
     private ITimeRTCService mTimingSwitchService;
     private IOtgService mOtgService;
     private IEthernetHelper mEthernetHelper;
+    private IEthernetHelper mUsbnetHelper;
     private PowerManager mPowerManager;
     private DevicePolicyManager mDevicePolicyManager;
     private AudioManager mAudioManager;
@@ -206,6 +213,7 @@ public class TBManager implements ITBManager {
         } else {
             mEthernetHelper = new EthernetHelper(mContext);
         }
+        mUsbnetHelper = new UsbnetHelperR(mContext);
 
         // 获取MCU Service
         Method method = null;
@@ -698,53 +706,108 @@ public class TBManager implements ITBManager {
     }
 
     @Override
-    public String getEthIp() {
-        return mEthernetHelper.getIp();
+    public String getIp(@NonNull String iface) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.getIp(iface);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.getIp(iface);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public String getEthNetmask() {
-        return mEthernetHelper.getNetmask();
+    public String getNetmask(String iface) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.getNetmask(iface);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.getNetmask(iface);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public String getEthGateway() {
-        return mEthernetHelper.getGateway();
+    public String getGateway(String iface) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.getGateway(iface);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.getGateway(iface);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public String getEthDns1() {
-        return mEthernetHelper.getDns1();
+    public String getDns1(String iface) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.getDns1(iface);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.getDns1(iface);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public String getEthDns2() {
-        return mEthernetHelper.getDns2();
+    public String getDns2(String iface) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.getDns2(iface);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.getDns2(iface);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public boolean setEthIp(String ip,
+    public boolean setIp(String iface,
+                            String ip,
                             String netmask,
                             String gateway,
                             String dns1,
                             String dns2,
                             @NonNull String mode) {
-        return mEthernetHelper.setIp(ip, netmask, gateway, dns1, dns2, mode);
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.setIp(iface, ip, netmask, gateway, dns1, dns2, mode);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.setIp(iface, ip, netmask, gateway, dns1, dns2, mode);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public boolean setEthEnabled(boolean enable) {
-        return mEthernetHelper.setEthEnabled(enable);
+    public boolean setNetEnabled(String iface, boolean enable) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.setEnabled(iface, enable);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.setEnabled(iface, enable);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public boolean isEthEnabled() {
-        return mEthernetHelper.isEthEnabled();
+    public boolean isNetEnabled(String iface) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.isEnabled(iface);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.isEnabled(iface);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override
-    public boolean isDhcp() {
-        return TextUtils.equals("DHCP", mEthernetHelper.getIpAssignment());
+    public String getIpAssignment(String iface) {
+        if (iface.startsWith(IFACE_PREFIX_ETH)) {
+            return mEthernetHelper.getIpAssignment(iface);
+        } else if (iface.startsWith(IFACE_PREFIX_USB)) {
+            return mUsbnetHelper.getIpAssignment(iface);
+        } else {
+            throw new InvalidParameterException(iface);
+        }
     }
 
     @Override

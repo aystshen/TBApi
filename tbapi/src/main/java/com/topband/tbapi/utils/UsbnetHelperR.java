@@ -16,33 +16,35 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-public class EthernetHelper implements IEthernetHelper {
-    private static final String TAG = "EthernetHelper";
+public class UsbnetHelperR implements IEthernetHelper {
+    private static final String TAG = "UsbnetHelperR";
 
-    private Object mEthManagerObj;
+    private Object mUsbnetManagerObj;
 
-    @SuppressLint("PrivateApi")
-    public EthernetHelper(Context context) {
+    @SuppressLint({"PrivateApi", "WrongConstant"})
+    public UsbnetHelperR(Context context) {
         try {
-            String service = (String) Context.class.getField("ETHERNET_SERVICE").get(null);
-            mEthManagerObj = context.getSystemService(service);
+            mUsbnetManagerObj = context.getSystemService("usbethernet");
+            if (mUsbnetManagerObj == null) {
+                throw new NullPointerException("no usbethernet service");
+            }
         } catch (Exception e) {
-            Log.e(TAG, "EthernetHelper, " + e.getMessage());
+            Log.e(TAG, "UsbnetHelperR, " + e.getMessage());
         }
     }
 
     /**
      * 获取IP
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface 网卡名（usb0/usb1/...）
      * @return IP
      */
     public String getIp(String iface) {
-        if (mEthManagerObj != null) {
+        if (mUsbnetManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getIpAddress");
+                Method method = mUsbnetManagerObj.getClass().getDeclaredMethod("getIpAddress", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj);
+                return (String) method.invoke(mUsbnetManagerObj, iface);
             } catch (Exception e) {
                 Log.e(TAG, "getIp, " + e.getMessage());
             }
@@ -54,15 +56,15 @@ public class EthernetHelper implements IEthernetHelper {
     /**
      * 获取子网掩码
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface 网卡名（usb0/usb1/...）
      * @return 子网掩码
      */
     public String getNetmask(String iface) {
-        if (mEthManagerObj != null) {
+        if (mUsbnetManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getNetmask");
+                Method method = mUsbnetManagerObj.getClass().getDeclaredMethod("getNetmask", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj);
+                return (String) method.invoke(mUsbnetManagerObj, iface);
             } catch (Exception e) {
                 Log.e(TAG, "getNetmask, " + e.getMessage());
             }
@@ -74,15 +76,15 @@ public class EthernetHelper implements IEthernetHelper {
     /**
      * 获取网关
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface 网卡名（usb0/usb1/...）
      * @return 网关
      */
     public String getGateway(String iface) {
-        if (mEthManagerObj != null) {
+        if (mUsbnetManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getGateway");
+                Method method = mUsbnetManagerObj.getClass().getDeclaredMethod("getGateway", String.class);
                 method.setAccessible(true);
-                return (String) method.invoke(mEthManagerObj);
+                return (String) method.invoke(mUsbnetManagerObj, iface);
             } catch (Exception e) {
                 Log.e(TAG, "getGateway, " + e.getMessage());
             }
@@ -94,15 +96,15 @@ public class EthernetHelper implements IEthernetHelper {
     /**
      * 获取DNS1
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface 网卡名（usb0/usb1/...）
      * @return DNS1
      */
     public String getDns1(String iface) {
-        if (mEthManagerObj != null) {
+        if (mUsbnetManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns");
+                Method method = mUsbnetManagerObj.getClass().getDeclaredMethod("getDns", String.class);
                 method.setAccessible(true);
-                String dns = (String) method.invoke(mEthManagerObj);
+                String dns = (String) method.invoke(mUsbnetManagerObj, iface);
                 String data[] = dns.split(",");
                 return data[0];
             } catch (Exception e) {
@@ -116,15 +118,15 @@ public class EthernetHelper implements IEthernetHelper {
     /**
      * 获取DNS2
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface 网卡名（usb0/usb1/...）
      * @return DNS2
      */
     public String getDns2(String iface) {
-        if (mEthManagerObj != null) {
+        if (mUsbnetManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getDns");
+                Method method = mUsbnetManagerObj.getClass().getDeclaredMethod("getDns", String.class);
                 method.setAccessible(true);
-                String dns = (String) method.invoke(mEthManagerObj);
+                String dns = (String) method.invoke(mUsbnetManagerObj, iface);
                 String data[] = dns.split(",");
                 return data[1];
             } catch (Exception e) {
@@ -138,15 +140,15 @@ public class EthernetHelper implements IEthernetHelper {
     /**
      * 获取IP分配方式
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface 网卡名（usb0/usb1/...）
      * @return DHCP：动态IP， STATIC：静态IP
      */
     public String getIpAssignment(String iface) {
-        if (mEthManagerObj != null) {
+        if (mUsbnetManagerObj != null) {
             try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("getConfiguration");
+                Method method = mUsbnetManagerObj.getClass().getDeclaredMethod("getConfiguration", String.class);
                 method.setAccessible(true);
-                Object configuration = method.invoke(mEthManagerObj);
+                Object configuration = method.invoke(mUsbnetManagerObj, iface);
                 Field ipAssignment = configuration.getClass().getDeclaredField("ipAssignment");
                 ipAssignment.setAccessible(true);
                 return ipAssignment.get(configuration).toString();
@@ -161,7 +163,7 @@ public class EthernetHelper implements IEthernetHelper {
     /**
      * 设置IP
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface      网卡名（usb0/usb1/...）
      * @param ipStr      IP
      * @param netmaskStr 子网掩码
      * @param gatewayStr 网关
@@ -264,9 +266,9 @@ public class EthernetHelper implements IEthernetHelper {
                             proxySettingsMap.get("NONE"), sicInstance, null);
 
                     // mEthManager.setConfiguration(mIpConfiguration);
-                    Method method = mEthManagerObj.getClass().getDeclaredMethod("setConfiguration", ipcClazz);
+                    Method method = mUsbnetManagerObj.getClass().getDeclaredMethod("setConfiguration", String.class, ipcClazz);
                     method.setAccessible(true);
-                    method.invoke(mEthManagerObj, ipcInstance);
+                    method.invoke(mUsbnetManagerObj, iface, ipcInstance);
                     break;
                 }
             }
@@ -279,43 +281,25 @@ public class EthernetHelper implements IEthernetHelper {
     }
 
     /**
-     * 开关以太网
+     * 开关网卡
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface  网卡名（usb0/usb1/...）
      * @param enable true：打开， false：关闭
      * @return true：成功， false：失败
      */
+    @Override
     public boolean setEnabled(String iface, boolean enable) {
-        if (mEthManagerObj != null) {
-            try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("setEthernetEnabled", Boolean.TYPE);
-                method.setAccessible(true);
-                return (boolean) method.invoke(mEthManagerObj, new Boolean(enable));
-            } catch (Exception e) {
-                Log.e(TAG, "setEthEnabled, " + e.getMessage());
-            }
-        }
-
-        return false;
+        return true;
     }
 
     /**
-     * 以太网是否打开
+     * 网卡是否打开
      *
-     * @param iface 网卡名（eth0/eth1/...）
+     * @param iface 网卡名（usb0/usb1/...）
      * @return true：打开， false：关闭
      */
+    @Override
     public boolean isEnabled(String iface) {
-        if (mEthManagerObj != null) {
-            try {
-                Method method = mEthManagerObj.getClass().getDeclaredMethod("isEthernetEnabled");
-                method.setAccessible(true);
-                return (boolean) method.invoke(mEthManagerObj);
-            } catch (Exception e) {
-                Log.e(TAG, "isEthEnabled, " + e.getMessage());
-            }
-        }
-
         return true;
     }
 

@@ -285,43 +285,49 @@ interface ITBManager {
     public String getEthMac();
 
     /**
-     * 获取以太网IP地址
+     * 获取IP地址
      *
-     * @return 以太网IP地址
+     * @param iface 网卡名（eth0/eth1/usb0...）
+     * @return IP地址
      */
-    public String getEthIp();
+    public String getIp(String iface);
 
     /**
-     * 获取以太网子网掩码
+     * 获取子网掩码
      *
-     * @return 以太网子网掩码
+     * @param iface 网卡名（eth0/eth1/usb0...）
+     * @return 子网掩码
      */
-    public String getEthNetmask();
+    public String getNetmask(String iface);
 
     /**
-     * 获取以太网网关
+     * 获取网关
      *
-     * @return 以太网网关
+     * @param iface 网卡名（eth0/eth1/usb0...）
+     * @return 网关
      */
-    public String getEthGateway();
+    public String getGateway(String iface);
 
     /**
-     * 获取以太网DNS1
+     * 获取DNS1
      *
-     * @return 以太网DNS1
+     * @param iface 网卡名（eth0/eth1/usb0...）
+     * @return DNS1
      */
-    public String getEthDns1();
+    public String getDns1(String iface);
 
     /**
-     * 获取以太网DNS2
+     * 获取DNS2
      *
-     * @return 以太网DNS2
+     * @param iface 网卡名（eth0/eth1/usb0...）
+     * @return DNS2
      */
-    public String getEthDns2();
+    public String getDns2(String iface);
 
     /**
-     * 设置以太网IP地址
+     * 设置IP地址
      *
+     * @param iface   网卡名（eth0/eth1/usb0...）
      * @param ip      IP地址
      * @param netmask 子网掩码
      * @param gateway 网关
@@ -331,29 +337,32 @@ interface ITBManager {
      *                STATIC：静态IP（其它参数不能为空）。
      *                DHCP：动态IP（其它参数可为空）。
      */
-    public boolean setEthIp(String ip, String netmask, String gateway, String dns1, String dns2, String mode);
+    public boolean setIp(String iface, String ip, String netmask, String gateway, String dns1, String dns2, String mode);
 
     /**
-     * 开关以太网
+     * 开关网卡
      *
+     * @param iface  网卡名（eth0/eth1/usb0...）
      * @param enable true：打开， false：关闭
      * @return true：成功， false：失败
      */
-    public boolean setEthEnabled(boolean enable);
+    public boolean setNetEnabled(String iface, boolean enable);
 
     /**
-     * 以太网是否打开
+     * 网卡是否打开
      *
+     * @param iface 网卡名（eth0/eth1/usb0...）
      * @return true：打开， false：关闭
      */
-    public boolean isEthEnabled();
+    public boolean isNetEnabled(String iface);
 
     /**
-     * 判断当前网络类型是DHCP或静态IP
+     * 获取IP分配方式
      *
-     * @return true：DHCP，false：静态IP
+     * @param iface 网卡名（eth0/eth1/usb0...）
+     * @return DHCP：动太分配，STATIC：静态IP
      */
-    public boolean isDhcp();
+    public String getIpAssignment(String iface);
 
     /**
      * 获取当前连网类型（WiFi、移动网络、有线）

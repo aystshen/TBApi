@@ -111,18 +111,20 @@ public class MainActivity extends AppCompatActivity implements
     TextView mWifiMacTv;
     @BindView(R.id.tv_eth_mac)
     TextView mEthMacTv;
-    @BindView(R.id.edt_eth_ip)
-    EditText mEthIpEdt;
-    @BindView(R.id.edt_eth_mask)
-    EditText mEthMaskEdt;
-    @BindView(R.id.edt_eth_gateway)
-    EditText mEthGatewayEdt;
-    @BindView(R.id.edt_eth_dns1)
-    EditText mEthDnsEdt1;
-    @BindView(R.id.edt_eth_dns2)
-    EditText mEthDnsEdt2;
+    @BindView(R.id.edt_ip)
+    EditText mIpEdt;
+    @BindView(R.id.edt_netmask)
+    EditText mNetmaskEdt;
+    @BindView(R.id.edt_gateway)
+    EditText mGatewayEdt;
+    @BindView(R.id.edt_dns1)
+    EditText mDnsEdt1;
+    @BindView(R.id.edt_dns2)
+    EditText mDnsEdt2;
     @BindView(R.id.btn_dhcp)
     ToggleButton mDhcpBtn;
+    @BindView(R.id.spn_iface)
+    Spinner mIfaceSpn;
     @BindView(R.id.tv_sdcard_path)
     TextView mSdcardPathTv;
     @BindView(R.id.tv_usb_path)
@@ -169,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements
     Button mWiegandReadBtn;
     @BindView(R.id.btn_wiegand_write)
     Button mWiegandWriteBtn;
-    @BindView(R.id.btn_eth)
+    @BindView(R.id.btn_net_enabled)
     ToggleButton mEthBtn;
     @BindView(R.id.btn_mute)
     ToggleButton mMuteBtn;
@@ -250,16 +252,37 @@ public class MainActivity extends AppCompatActivity implements
                 mEthRdo.setChecked(true);
                 break;
         }
-        mDhcpBtn.setChecked(mTBManager.isDhcp());
-        mDhcpBtn.setOnCheckedChangeListener(this);
+
         mWifiMacTv.setText(mTBManager.getWiFiMac());
         mEthMacTv.setText(mTBManager.getEthMac());
-        mEthIpEdt.setText(mTBManager.getEthIp());
-        mEthMaskEdt.setText(mTBManager.getEthNetmask());
-        mEthGatewayEdt.setText(mTBManager.getEthGateway());
-        mEthDnsEdt1.setText(mTBManager.getEthDns1());
-        mEthDnsEdt2.setText(mTBManager.getEthDns2());
-        mEthBtn.setChecked(mTBManager.isEthEnabled());
+
+        String iface = mIfaceSpn.getSelectedItem().toString();
+        mDhcpBtn.setChecked(TextUtils.equals(mTBManager.getIpAssignment(iface), "DHCP"));
+        mIpEdt.setText(mTBManager.getIp(iface));
+        mNetmaskEdt.setText(mTBManager.getNetmask(iface));
+        mGatewayEdt.setText(mTBManager.getGateway(iface));
+        mDnsEdt1.setText(mTBManager.getDns1(iface));
+        mDnsEdt2.setText(mTBManager.getDns2(iface));
+        mEthBtn.setChecked(mTBManager.isNetEnabled(iface));
+        mIfaceSpn.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String iface = mIfaceSpn.getSelectedItem().toString();
+                mIpEdt.setText(mTBManager.getIp(iface));
+                mNetmaskEdt.setText(mTBManager.getNetmask(iface));
+                mGatewayEdt.setText(mTBManager.getGateway(iface));
+                mDnsEdt1.setText(mTBManager.getDns1(iface));
+                mDnsEdt2.setText(mTBManager.getDns2(iface));
+                mEthBtn.setChecked(mTBManager.isNetEnabled(iface));
+                mDhcpBtn.setChecked(TextUtils.equals(mTBManager.getIpAssignment(iface), "DHCP"));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+        mDhcpBtn.setOnCheckedChangeListener(this);
         mEthBtn.setOnCheckedChangeListener(this);
 
         // 存储
@@ -540,26 +563,26 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.btn_dhcp:
                 if (b) {
-                    mTBManager.setEthIp(null, null, null, null, null, "DHCP");
+                    mTBManager.setIp(mIfaceSpn.getSelectedItem().toString(), null, null, null, null, null, "DHCP");
                 } else {
-                    String ip = mEthIpEdt.getText().toString();
-                    String mask = mEthMaskEdt.getText().toString();
-                    String gateway = mEthGatewayEdt.getText().toString();
-                    String dns1 = mEthDnsEdt1.getText().toString();
-                    String dns2 = mEthDnsEdt2.getText().toString();
+                    String ip = mIpEdt.getText().toString();
+                    String mask = mNetmaskEdt.getText().toString();
+                    String gateway = mGatewayEdt.getText().toString();
+                    String dns1 = mDnsEdt1.getText().toString();
+                    String dns2 = mDnsEdt2.getText().toString();
                     if (!TextUtils.isEmpty(ip)
                             && !TextUtils.isEmpty(mask)
                             && !TextUtils.isEmpty(gateway)
                             && !TextUtils.isEmpty(dns1)) {
-                        mTBManager.setEthIp(ip, mask, gateway, dns1, dns2, "STATIC");
+                        mTBManager.setIp(mIfaceSpn.getSelectedItem().toString(), ip, mask, gateway, dns1, dns2, "STATIC");
                     } else {
                         Toast.makeText(this, "请输入IP地址、子网掩码、网关、DNS！",
                                 Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
-            case R.id.btn_eth:
-                mTBManager.setEthEnabled(b);
+            case R.id.btn_net_enabled:
+                mTBManager.setNetEnabled(mIfaceSpn.getSelectedItem().toString(), b);
                 break;
             case R.id.btn_gpio_direction:
                 if (b) {

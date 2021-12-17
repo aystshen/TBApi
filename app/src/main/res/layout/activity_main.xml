@@ -512,7 +512,7 @@
                         android:text="IP地址：" />
 
                     <EditText
-                        android:id="@+id/edt_eth_ip"
+                        android:id="@+id/edt_ip"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:digits="0123456789."/>
@@ -531,7 +531,7 @@
                         android:text="子网掩码：" />
 
                     <EditText
-                        android:id="@+id/edt_eth_mask"
+                        android:id="@+id/edt_netmask"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:digits="0123456789."/>
@@ -550,7 +550,7 @@
                         android:text="网关：" />
 
                     <EditText
-                        android:id="@+id/edt_eth_gateway"
+                        android:id="@+id/edt_gateway"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:digits="0123456789."/>
@@ -569,7 +569,7 @@
                         android:text="DNS1：" />
 
                     <EditText
-                        android:id="@+id/edt_eth_dns1"
+                        android:id="@+id/edt_dns1"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:digits="0123456789."/>
@@ -588,7 +588,7 @@
                         android:text="DNS2：" />
 
                     <EditText
-                        android:id="@+id/edt_eth_dns2"
+                        android:id="@+id/edt_dns2"
                         android:layout_width="200dp"
                         android:layout_height="wrap_content"
                         android:digits="0123456789."/>
@@ -601,6 +601,12 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp">
 
+                    <Spinner
+                        android:id="@+id/spn_iface"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/iface"/>
+
                     <ToggleButton
                         android:id="@+id/btn_dhcp"
                         android:layout_width="wrap_content"
@@ -609,11 +615,11 @@
                         android:textOn="DHCP" />
 
                     <ToggleButton
-                        android:id="@+id/btn_eth"
+                        android:id="@+id/btn_net_enabled"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textOff="以太网（关）"
-                        android:textOn="以太网（开）" />
+                        android:textOff="网卡（关）"
+                        android:textOn="网卡（开）" />
                 </LinearLayout>
 
             </LinearLayout>
