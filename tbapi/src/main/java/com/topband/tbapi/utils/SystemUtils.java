@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.StatFs;
 import android.os.storage.StorageManager;
+import android.text.TextUtils;
 
 import androidx.annotation.RequiresApi;
 
@@ -17,6 +18,10 @@ import java.lang.reflect.Method;
 import java.util.UUID;
 
 public class SystemUtils {
+
+    // su 别名
+    private static String sSuAlias = "";
+
     /**
      * 获取属性
      *
@@ -112,5 +117,17 @@ public class SystemUtils {
         StatFs statFs = new StatFs(Environment.getExternalStorageDirectory().getPath());
 
         return statFs.getTotalBytes();
+    }
+
+    /**
+     * 获取su命令别名（个别项目会重命名su）
+     *
+     * @return su别名
+     */
+    public static String getSuAlias() {
+        if (TextUtils.isEmpty(sSuAlias)) {
+            sSuAlias = getProperty("ro.su_alias", "su");
+        }
+        return sSuAlias;
     }
 }

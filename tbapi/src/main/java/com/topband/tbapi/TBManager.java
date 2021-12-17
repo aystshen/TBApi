@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import com.ayst.androidx.IKeyInterceptService;
 import com.ayst.androidx.ILog2fileService;
@@ -32,6 +33,7 @@ import com.ayst.androidx.IOtgService;
 import com.ayst.androidx.ITimeRTCService;
 import com.ayst.romupgrade.IRomUpgradeService;
 import com.topband.tbapi.utils.DeviceInfoUtils;
+import com.topband.tbapi.utils.DnsUtils;
 import com.topband.tbapi.utils.EthernetHelper;
 import com.topband.tbapi.utils.EthernetHelperR;
 import com.topband.tbapi.utils.IEthernetHelper;
@@ -49,12 +51,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class TBManager implements ITBManager {
     private static final String TAG = "TBManager";
 
     // API版本
-    private static final String VERSION = "1.0.11";
+    private static final String VERSION = "1.0.12";
 
     // 屏幕旋转角度
     public static final int SCREEN_ANGLE_0 = 0;
@@ -814,6 +818,26 @@ public class TBManager implements ITBManager {
     public int getNetworkType() {
         //TODO
         return 0;
+    }
+
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public boolean setDns(@NonNull String dns1, String dns2) {
+        try {
+            InetAddress address1 = null;
+            InetAddress address2 = null;
+            if (!TextUtils.isEmpty(dns1)) {
+                address1 = InetAddress.getByName(dns1);
+            }
+            if (!TextUtils.isEmpty(dns2)) {
+                address2 = InetAddress.getByName(dns2);
+            }
+            return DnsUtils.setDns(mContext, address1, address2);
+        } catch (UnknownHostException e) {
+            Log.e(TAG, "setDns, " + e.getMessage());
+        }
+
+        return false;
     }
 
     @Override

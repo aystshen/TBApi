@@ -125,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements
     ToggleButton mDhcpBtn;
     @BindView(R.id.spn_iface)
     Spinner mIfaceSpn;
+    @BindView(R.id.btn_set_gateway)
+    Button mSetGatewayBtn;
+    @BindView(R.id.btn_set_dns)
+    Button mDnsBtn;
     @BindView(R.id.tv_sdcard_path)
     TextView mSdcardPathTv;
     @BindView(R.id.tv_usb_path)
@@ -373,7 +377,8 @@ public class MainActivity extends AppCompatActivity implements
             R.id.btn_rotation, R.id.btn_check_update, R.id.btn_install_update, R.id.btn_verity_update,
             R.id.btn_delete_update, R.id.btn_gpio, R.id.btn_get_gpio,
             R.id.btn_refresh_camera, R.id.btn_set_log2file_num, R.id.btn_get_log2file_num,
-            R.id.btn_shell_cmd, R.id.btn_silent_install, R.id.btn_wiegand_read, R.id.btn_wiegand_write})
+            R.id.btn_shell_cmd, R.id.btn_silent_install, R.id.btn_wiegand_read, R.id.btn_wiegand_write,
+            R.id.btn_set_gateway, R.id.btn_set_dns})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.btn_shutdown:
@@ -512,6 +517,25 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             case R.id.btn_wiegand_write:
                 mTBManager.wiegandWrite(0x00776677); // 0x00776677 为固定的测试数据
+                break;
+            case R.id.btn_set_gateway:
+                String gateway = mGatewayEdt.getText().toString();
+                if (!TextUtils.isEmpty(gateway)) {
+                    //mTBManager.execCmd("busybox route del default gw " + gateway + " dev usb0", true);
+                    mTBManager.execCmd("busybox route add default gw " + gateway + " dev usb0", true);
+                } else {
+                    Toast.makeText(this, "请输入网关！", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            case R.id.btn_set_dns:
+                String dns1 = mDnsEdt1.getText().toString();
+                String dns2 = mDnsEdt2.getText().toString();
+                if (!TextUtils.isEmpty(dns1)
+                    && !TextUtils.isEmpty(dns2)) {
+                    mTBManager.setDns(dns1, dns2);
+                } else {
+                    Toast.makeText(this, "请输入DNS！", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

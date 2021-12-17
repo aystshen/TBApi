@@ -372,6 +372,15 @@ interface ITBManager {
     public int getNetworkType();
 
     /**
+     * 设置DNS
+     *
+     * @param dns1 DNS
+     * @param dns2 DNS
+     * @return true：成功，false：失败
+     */
+    public boolean setDns(String dns1, String dns2);
+
+    /**
      * 获取外部存储 SD卡路径
      *
      * @return 外部存储SD卡路径

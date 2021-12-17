@@ -595,11 +595,13 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
+                <com.google.android.flexbox.FlexboxLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp">
+                    android:padding="5dp"
+                    app:alignContent="stretch"
+                    app:alignItems="stretch"
+                    app:flexWrap="wrap">
 
                     <Spinner
                         android:id="@+id/spn_iface"
@@ -620,7 +622,19 @@
                         android:layout_height="wrap_content"
                         android:textOff="网卡（关）"
                         android:textOn="网卡（开）" />
-                </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btn_set_gateway"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置网关"/>
+
+                    <Button
+                        android:id="@+id/btn_set_dns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="设置DNS"/>
+                </com.google.android.flexbox.FlexboxLayout>
 
             </LinearLayout>
 
