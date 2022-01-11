@@ -686,7 +686,7 @@ public class TBManager implements ITBManager {
         }
     }
 
-    @SuppressLint("HardwareIds")
+    @SuppressLint({"HardwareIds", "MissingPermission"})
     @Override
     public String getWiFiMac() {
         WifiManager wifiManager = (WifiManager) mContext.getApplicationContext()
