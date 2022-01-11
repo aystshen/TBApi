@@ -49,6 +49,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.InvalidParameterException;
 import java.net.InetAddress;
@@ -225,8 +226,10 @@ public class TBManager implements ITBManager {
             method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
             IBinder binder = (IBinder) method.invoke(null, new Object[]{"mcu"});
             mMcuService = IMcuService.Stub.asInterface(binder);
+        } catch (NoSuchMethodError e) {
+            e.printStackTrace();
         } catch (Exception e) {
-            Log.e(TAG, "TBManager, get mcu service fail");
+            e.printStackTrace();
         }
 
         // 获取GPIO Service
@@ -234,6 +237,8 @@ public class TBManager implements ITBManager {
             method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
             IBinder binder = (IBinder) method.invoke(null, new Object[]{"gpio"});
             mGpioService = IGpioService.Stub.asInterface(binder);
+        } catch (NoSuchMethodError e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -243,6 +248,8 @@ public class TBManager implements ITBManager {
             method = Class.forName("android.os.ServiceManager").getMethod("getService", String.class);
             IBinder binder = (IBinder) method.invoke(null, new Object[]{"wiegand"});
             mWiegandService = IWiegandService.Stub.asInterface(binder);
+        } catch (NoSuchMethodError e) {
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
