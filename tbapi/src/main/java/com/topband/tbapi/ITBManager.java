@@ -645,4 +645,6 @@ interface ITBManager {
      * @return true：打开，false：关闭
      */
     public boolean isAdbOpen();
+
+    public void sendKey(final int keycode);
 }

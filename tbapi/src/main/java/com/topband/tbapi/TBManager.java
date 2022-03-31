@@ -2,6 +2,7 @@ package com.topband.tbapi;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Instrumentation;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -22,6 +23,7 @@ import android.os.RemoteException;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -49,28 +51,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.security.InvalidParameterException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.InvalidParameterException;
 
 public class TBManager implements ITBManager {
-    private static final String TAG = "TBManager";
-
-    // API版本
-    private static final String VERSION = "1.0.12";
-
     // 屏幕旋转角度
     public static final int SCREEN_ANGLE_0 = 0;
     public static final int SCREEN_ANGLE_90 = 90;
     public static final int SCREEN_ANGLE_180 = 180;
     public static final int SCREEN_ANGLE_270 = 270;
-
     // 网卡前缀
     public static final String IFACE_PREFIX_ETH = "eth";
     public static final String IFACE_PREFIX_USB = "usb";
-
+    private static final String TAG = "TBManager";
+    // API版本
+    private static final String VERSION = "1.0.15";
     private Context mContext;
     private IMcuService mMcuService;
     private IGpioService mGpioService;
@@ -618,10 +615,15 @@ public class TBManager implements ITBManager {
             mPowerManager = ((PowerManager) mContext.getSystemService(Context.POWER_SERVICE));
         }
         PowerManager.WakeLock wakeLock = mPowerManager.newWakeLock(
-                PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK,
+                PowerManager.ACQUIRE_CAUSES_WAKEUP
+                        | PowerManager.SCREEN_BRIGHT_WAKE_LOCK
+                        | PowerManager.ON_AFTER_RELEASE,
                 "tbapi:screenOn");
+
         wakeLock.acquire();
         wakeLock.release();
+
+        sendKey(KeyEvent.KEYCODE_F12);
     }
 
     @Override
@@ -773,12 +775,12 @@ public class TBManager implements ITBManager {
 
     @Override
     public boolean setIp(String iface,
-                            String ip,
-                            String netmask,
-                            String gateway,
-                            String dns1,
-                            String dns2,
-                            @NonNull String mode) {
+                         String ip,
+                         String netmask,
+                         String gateway,
+                         String dns1,
+                         String dns2,
+                         @NonNull String mode) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.setIp(iface, ip, netmask, gateway, dns1, dns2, mode);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -1272,6 +1274,21 @@ public class TBManager implements ITBManager {
             Log.e(TAG, "isAdbEnabled, " + e.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public void sendKey(final int keycode) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Instrumentation inst = new Instrumentation();
+                    inst.sendKeyDownUpSync(keycode);
+                } catch (Exception e) {
+                    Log.e(TAG, "sendKey, " + e.getMessage());
+                }
+            }
+        }).start();
     }
 
     public enum WiegandFormat {
