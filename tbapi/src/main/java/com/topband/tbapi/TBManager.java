@@ -67,7 +67,7 @@ public class TBManager {
     public static final String IFACE_PREFIX_USB = "usb";
     private static final String TAG = "TBManager";
     // API版本
-    private static final String VERSION = "1.0.15";
+    private static final String VERSION = "1.0.16";
     private Context mContext;
     private IMcuService mMcuService;
     private IGpioService mGpioService;
@@ -186,7 +186,7 @@ public class TBManager {
         }
     };
 
-    public TBManager(Context context) {
+    public TBManager(@NonNull Context context) {
         mContext = context;
     }
 
@@ -905,7 +905,7 @@ public class TBManager {
      * @param iface 网卡名（eth0/eth1/usb0...）
      * @return 子网掩码
      */
-    public String getNetmask(String iface) {
+    public String getNetmask(@NonNull String iface) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.getNetmask(iface);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -921,7 +921,7 @@ public class TBManager {
      * @param iface 网卡名（eth0/eth1/usb0...）
      * @return 网关
      */
-    public String getGateway(String iface) {
+    public String getGateway(@NonNull String iface) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.getGateway(iface);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -937,7 +937,7 @@ public class TBManager {
      * @param iface 网卡名（eth0/eth1/usb0...）
      * @return DNS1
      */
-    public String getDns1(String iface) {
+    public String getDns1(@NonNull String iface) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.getDns1(iface);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -953,7 +953,7 @@ public class TBManager {
      * @param iface 网卡名（eth0/eth1/usb0...）
      * @return DNS2
      */
-    public String getDns2(String iface) {
+    public String getDns2(@NonNull String iface) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.getDns2(iface);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -976,7 +976,7 @@ public class TBManager {
      *                STATIC：静态IP（其它参数不能为空）。
      *                DHCP：动态IP（其它参数可为空）。
      */
-    public boolean setIp(String iface,
+    public boolean setIp(@NonNull String iface,
                          String ip,
                          String netmask,
                          String gateway,
@@ -999,7 +999,7 @@ public class TBManager {
      * @param enable true：打开， false：关闭
      * @return true：成功， false：失败
      */
-    public boolean setNetEnabled(String iface, boolean enable) {
+    public boolean setNetEnabled(@NonNull String iface, boolean enable) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.setEnabled(iface, enable);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -1015,7 +1015,7 @@ public class TBManager {
      * @param iface 网卡名（eth0/eth1/usb0...）
      * @return true：打开， false：关闭
      */
-    public boolean isNetEnabled(String iface) {
+    public boolean isNetEnabled(@NonNull String iface) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.isEnabled(iface);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -1031,7 +1031,7 @@ public class TBManager {
      * @param iface 网卡名（eth0/eth1/usb0...）
      * @return DHCP：动太分配，STATIC：静态IP
      */
-    public String getIpAssignment(String iface) {
+    public String getIpAssignment(@NonNull String iface) {
         if (iface.startsWith(IFACE_PREFIX_ETH)) {
             return mEthernetHelper.getIpAssignment(iface);
         } else if (iface.startsWith(IFACE_PREFIX_USB)) {
@@ -1449,7 +1449,7 @@ public class TBManager {
      * @param mode 0: auto, 1: host, 2: device
      * @return true：成功，false：失败
      */
-    public boolean setOtgMode(String mode) {
+    public boolean setOtgMode(@NonNull String mode) {
         if (mOtgService != null) {
             try {
                 return mOtgService.setOtgMode(mode);
@@ -1467,7 +1467,7 @@ public class TBManager {
      * @param save true：保存，false：不保存，单次有效
      * @return true：成功，false：失败
      */
-    public boolean setOtgModeExt(String mode, boolean save) {
+    public boolean setOtgModeExt(@NonNull String mode, boolean save) {
         if (mOtgService != null) {
             try {
                 return mOtgService.setOtgModeExt(mode, save);
@@ -1524,7 +1524,7 @@ public class TBManager {
      *               TBManager.WiegandFormat.WIEGAND_FORMAT_24：韦根34格式
      * @return true：成功，false：失败
      */
-    public boolean setWiegandReadFormat(WiegandFormat format) {
+    public boolean setWiegandReadFormat(@NonNull WiegandFormat format) {
         if (mWiegandService != null) {
             try {
                 int ret = -1;
@@ -1553,7 +1553,7 @@ public class TBManager {
      *               TBManager.WiegandFormat.WIEGAND_FORMAT_24：韦根34格式
      * @return true：成功，false：失败
      */
-    public boolean setWiegandWriteFormat(WiegandFormat format) {
+    public boolean setWiegandWriteFormat(@NonNull WiegandFormat format) {
         if (mWiegandService != null) {
             try {
                 int ret = -1;
