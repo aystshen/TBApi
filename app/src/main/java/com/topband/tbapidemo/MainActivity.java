@@ -532,7 +532,11 @@ public class MainActivity extends AppCompatActivity implements
                 String dns2 = mDnsEdt2.getText().toString();
                 if (!TextUtils.isEmpty(dns1)
                     && !TextUtils.isEmpty(dns2)) {
-                    mTBManager.setDns(dns1, dns2);
+                    if (mIfaceSpn.getSelectedItem().toString().startsWith("usb")) {
+                        mTBManager.setDnsTether(dns1, dns2);
+                    } else {
+                        mTBManager.setDns(dns1, dns2);
+                    }
                 } else {
                     Toast.makeText(this, "请输入DNS！", Toast.LENGTH_SHORT).show();
                 }
