@@ -67,7 +67,7 @@ public class TBManager {
     public static final String IFACE_PREFIX_USB = "usb";
     private static final String TAG = "TBManager";
     // API版本
-    private static final String VERSION = "1.0.16";
+    private static final String VERSION = "1.0.17";
     private Context mContext;
     private IMcuService mMcuService;
     private IGpioService mGpioService;
@@ -1059,7 +1059,7 @@ public class TBManager {
      * @return true：成功，false：失败
      */
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public boolean setDns(@NonNull String dns1, @NonNull String dns2) {
+    public boolean setDns(@NonNull String dns1, String dns2) {
         try {
             InetAddress address1 = null;
             InetAddress address2 = null;
@@ -1084,9 +1084,9 @@ public class TBManager {
      * @param dns2 DNS
      * @return true：成功，false：失败
      */
-    public boolean setDnsTether(@NonNull String dns1, @NonNull String dns2) {
+    public boolean setDnsTether(@NonNull String dns1, String dns2) {
         ShellUtils.CommandResult result = ShellUtils.execCmd(
-                "ndc tether dns set oem0 " + dns1 + " " + dns2, false);
+                "ndc tether dns set oem0 " + dns1 + " " + (dns2 != null ? dns2 : ""), false);
         Log.i(TAG, "setDnsTether, " + result.toString());
         return TextUtils.isEmpty(result.errorMsg);
     }
@@ -1690,6 +1690,22 @@ public class TBManager {
                 }
             }
         }).start();
+    }
+
+    /**
+     * 设置LED亮度
+     *
+     * @param devices    设备名
+     * @param brightness 亮度值（0~1000）
+     * @return true：成功，false：失败
+     */
+    public boolean setLedBrightness(String devices, int brightness) {
+        String cmd = "echo " + brightness + " >  " + "/sys/class/leds/" + devices + "/brightness";
+
+        ShellUtils.CommandResult result = ShellUtils.execCmd(cmd, false);
+        Log.i(TAG, "setLedBrightness, " + result.toString());
+
+        return result.errorMsg.isEmpty();
     }
 
     public enum WiegandFormat {

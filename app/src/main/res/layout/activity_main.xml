@@ -980,6 +980,44 @@
 
             </LinearLayout>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="LED" />
+
+            <com.google.android.flexbox.FlexboxLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_group"
+                android:padding="5dp"
+                app:alignContent="stretch"
+                app:alignItems="stretch"
+                app:flexWrap="wrap">
+
+                <ToggleButton
+                    android:id="@+id/btn_led_r"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="红"
+                    android:textOn="红" />
+
+                <ToggleButton
+                    android:id="@+id/btn_led_g"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="绿"
+                    android:textOn="绿" />
+
+                <ToggleButton
+                    android:id="@+id/btn_led_b"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textOff="蓝"
+                    android:textOn="蓝" />
+
+            </com.google.android.flexbox.FlexboxLayout>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

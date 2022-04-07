@@ -183,6 +183,12 @@ public class MainActivity extends AppCompatActivity implements
     ToggleButton mAdbBtn;
     @BindView(R.id.spn_otg)
     Spinner mOtgSpn;
+    @BindView(R.id.btn_led_r)
+    ToggleButton mLedRBtn;
+    @BindView(R.id.btn_led_g)
+    ToggleButton mLedGBtn;
+    @BindView(R.id.btn_led_b)
+    ToggleButton mLedBBtn;
 
     private TBManager mTBManager;
     private Handler mHandler;
@@ -340,6 +346,9 @@ public class MainActivity extends AppCompatActivity implements
         mMuteBtn.setOnCheckedChangeListener(this);
         mAdbBtn.setChecked(mTBManager.isAdbOpen());
         mAdbBtn.setOnCheckedChangeListener(this);
+        mLedRBtn.setOnCheckedChangeListener(this);
+        mLedGBtn.setOnCheckedChangeListener(this);
+        mLedBBtn.setOnCheckedChangeListener(this);
 
         // 韦根
         mTBManager.setWiegandReadFormat(TBManager.WiegandFormat.WIEGAND_FORMAT_26);
@@ -530,8 +539,7 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.btn_set_dns:
                 String dns1 = mDnsEdt1.getText().toString();
                 String dns2 = mDnsEdt2.getText().toString();
-                if (!TextUtils.isEmpty(dns1)
-                    && !TextUtils.isEmpty(dns2)) {
+                if (!TextUtils.isEmpty(dns1)) {
                     if (mIfaceSpn.getSelectedItem().toString().startsWith("usb")) {
                         mTBManager.setDnsTether(dns1, dns2);
                     } else {
@@ -676,6 +684,27 @@ public class MainActivity extends AppCompatActivity implements
                     mTBManager.openAdb();
                 } else {
                     mTBManager.closeAdb();
+                }
+                break;
+            case R.id.btn_led_r:
+                if (b) {
+                    mTBManager.setLedBrightness("led_r", 1000);
+                } else {
+                    mTBManager.setLedBrightness("led_r", 0);
+                }
+                break;
+            case R.id.btn_led_g:
+                if (b) {
+                    mTBManager.setLedBrightness("led_g", 1000);
+                } else {
+                    mTBManager.setLedBrightness("led_g", 0);
+                }
+                break;
+            case R.id.btn_led_b:
+                if (b) {
+                    mTBManager.setLedBrightness("led_b", 1000);
+                } else {
+                    mTBManager.setLedBrightness("led_b", 0);
                 }
                 break;
         }
